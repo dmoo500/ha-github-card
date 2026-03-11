@@ -91,6 +91,18 @@ export type SlotKey =
   | "last_release"
   | "none";
 
+/** A single conditional color rule for a numeric slot */
+export interface SlotColorRule {
+  /** Comparison operator */
+  op: ">" | ">=" | "<" | "<=" | "==";
+  /** Threshold value to compare against */
+  value: number;
+  /** CSS color string, e.g. '#f44336' or 'var(--error-color)' */
+  color: string;
+  /** Whether to color the text or the cell background. Default: "text" */
+  type?: "text" | "background";
+}
+
 // GitHub Card Configuration
 export interface GithubCardConfig {
   type: string;
@@ -113,6 +125,8 @@ export interface GithubCardConfig {
   row3_slots?: [SlotKey, SlotKey];
   /** Per-slot icon override (e.g. { stars: 'mdi:star-outline' }) */
   icons?: Partial<Record<SlotKey, string>>;
+  /** Per-slot conditional color rules — first matching rule wins */
+  slot_colors?: Partial<Record<SlotKey, SlotColorRule[]>>;
 }
 
 // GitHub Entity Attributes (as provided by HA GitHub integration)
