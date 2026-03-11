@@ -325,7 +325,7 @@ export function resolveGithubDevice(
   );
 
   // Friendly name: prefer device registry name, then strip metric suffix from entity
-  let friendlyName = entityId;
+  let friendlyName: string;
   if (deviceId && hass.devices?.[deviceId]) {
     const dev = hass.devices[deviceId];
     friendlyName = dev.name_by_user ?? dev.name ?? entityId;

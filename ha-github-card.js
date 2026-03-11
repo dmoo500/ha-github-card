@@ -703,7 +703,7 @@ function ge(i, e) {
     "[ha-github-card] resolveGithubDevice — slot_icons:",
     h
   );
-  let c = e;
+  let c;
   if (r && i.devices?.[r]) {
     const l = i.devices[r];
     c = l.name_by_user ?? l.name ?? e, !n.html_url && l.configuration_url && (n.html_url = l.configuration_url), !n.full_name && l.name && (n.full_name = l.name);
