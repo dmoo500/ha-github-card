@@ -6,7 +6,7 @@ export interface EntityRegistryEntry {
   device_id?: string | null;
   area_id?: string | null;
   translation_key?: string | null;
-  name?: string | null;          // user-set name
+  name?: string | null; // user-set name
   original_name?: string | null;
 }
 
@@ -30,12 +30,12 @@ export interface HomeAssistant {
   callService: (
     domain: string,
     service: string,
-    serviceData?: Record<string, unknown>
+    serviceData?: Record<string, unknown>,
   ) => Promise<void>;
   connection: {
     subscribeEvents: (
       callback: (event: HassEvent) => void,
-      eventType: string
+      eventType: string,
     ) => Promise<() => void>;
   };
   language: string;
@@ -82,14 +82,14 @@ export interface HassEvent {
 
 // Configurable slot keys for card rows
 export type SlotKey =
-  | 'stars'
-  | 'forks'
-  | 'watchers'
-  | 'issues'
-  | 'pull_requests'
-  | 'last_commit'
-  | 'last_release'
-  | 'none';
+  | "stars"
+  | "forks"
+  | "watchers"
+  | "issues"
+  | "pull_requests"
+  | "last_commit"
+  | "last_release"
+  | "none";
 
 // GitHub Card Configuration
 export interface GithubCardConfig {
