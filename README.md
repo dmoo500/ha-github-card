@@ -82,6 +82,9 @@ row3_slots:
 | `language`      | 💻 Primary language badge |
 | `none`          | Empty column (hidden) |
 
+
+![Screenshot](docs/screenshot.png)
+
 ## Development
 
 ```bash
