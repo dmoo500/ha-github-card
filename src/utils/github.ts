@@ -310,9 +310,27 @@ export function resolveGithubDevice(
     }
     if (attrs.full_name) combined.full_name = attrs.full_name as string;
     if (attrs.language) combined.language = attrs.language as string;
+    // Direct attribute (non-standard, future-proof)
     if (attrs.owner_avatar)
       combined.owner_avatar = attrs.owner_avatar as string;
     if (attrs.owner_login) combined.owner_login = attrs.owner_login as string;
+    // HA GitHub integration may expose owner as a nested object
+    if (attrs.owner && typeof attrs.owner === "object") {
+      const owner = attrs.owner as Record<string, unknown>;
+      if (!combined.owner_avatar && owner.avatar_url)
+        combined.owner_avatar = owner.avatar_url as string;
+      if (!combined.owner_login && owner.login)
+        combined.owner_login = owner.login as string;
+    }
+  }
+
+  // Fallback: derive avatar URL from full_name (e.g. "owner/repo" → GitHub avatar CDN)
+  if (!combined.owner_avatar && combined.full_name) {
+    const ownerPart = combined.full_name.split("/")[0];
+    if (ownerPart) {
+      combined.owner_login = combined.owner_login ?? ownerPart;
+      combined.owner_avatar = `https://avatars.githubusercontent.com/${ownerPart}?s=60`;
+    }
   }
 
   console.debug(

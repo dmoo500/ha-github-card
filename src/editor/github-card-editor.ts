@@ -4,6 +4,7 @@ import type {
   HomeAssistant,
   GithubCardConfig,
   SlotKey,
+  SlotColorRule,
 } from "../types/index.js";
 import { getGithubEntities } from "../utils/github.js";
 
@@ -135,6 +136,42 @@ export class GithubCardEditor extends LitElement {
       ...this._config!,
       rows: rows.filter((_, i) => i !== rowIdx),
     });
+  }
+
+  private _addColorRule(key: SlotKey): void {
+    const slot_colors = { ...(this._config!.slot_colors ?? {}) };
+    const rules = [...(slot_colors[key] ?? [])];
+    rules.push({
+      op: ">=",
+      value: 0,
+      color: "var(--error-color, #f44336)",
+      type: "text",
+    });
+    slot_colors[key] = rules;
+    this._fireConfigChanged({ ...this._config!, slot_colors });
+  }
+
+  private _removeColorRule(key: SlotKey, idx: number): void {
+    const slot_colors = { ...(this._config!.slot_colors ?? {}) };
+    const rules = [...(slot_colors[key] ?? [])].filter((_, i) => i !== idx);
+    if (rules.length === 0) {
+      delete slot_colors[key];
+    } else {
+      slot_colors[key] = rules;
+    }
+    this._fireConfigChanged({ ...this._config!, slot_colors });
+  }
+
+  private _updateColorRule(
+    key: SlotKey,
+    idx: number,
+    patch: Partial<SlotColorRule>,
+  ): void {
+    const slot_colors = { ...(this._config!.slot_colors ?? {}) };
+    const rules = [...(slot_colors[key] ?? [])];
+    rules[idx] = { ...rules[idx], ...patch };
+    slot_colors[key] = rules;
+    this._fireConfigChanged({ ...this._config!, slot_colors });
   }
 
   private _fireConfigChanged(config: GithubCardConfig): void {
@@ -301,6 +338,107 @@ export class GithubCardEditor extends LitElement {
             </button>
           `
         : nothing}
+
+      <div class="section-label">Conditional Colors</div>
+      ${(
+        [
+          ["stars", "Stars"],
+          ["forks", "Forks"],
+          ["watchers", "Watchers"],
+          ["issues", "Issues"],
+          ["pull_requests", "Pull Requests"],
+        ] as [SlotKey, string][]
+      ).map(([key, label]) => {
+        const rules = cfg.slot_colors?.[key] ?? [];
+        return html`
+          <div class="color-slot-block">
+            <div class="color-slot-header">
+              <span class="color-slot-label">${label}</span>
+              <button
+                class="add-color-btn"
+                @click="${() => this._addColorRule(key)}"
+              >
+                + Rule
+              </button>
+            </div>
+            ${rules.map(
+              (rule, idx) => html`
+                <div class="color-rule-row">
+                  <select
+                    class="color-type-select"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        type: (e.target as HTMLSelectElement)
+                          .value as SlotColorRule["type"],
+                      })}"
+                  >
+                    <option
+                      value="text"
+                      ?selected="${rule.type !== "background"}"
+                    >
+                      Text
+                    </option>
+                    <option
+                      value="background"
+                      ?selected="${rule.type === "background"}"
+                    >
+                      BG
+                    </option>
+                  </select>
+                  <select
+                    class="color-op-select"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        op: (e.target as HTMLSelectElement)
+                          .value as SlotColorRule["op"],
+                      })}"
+                  >
+                    ${(
+                      [">", ">=", "<", "<=", "=="] as SlotColorRule["op"][]
+                    ).map(
+                      (op) => html`
+                        <option value="${op}" ?selected="${rule.op === op}">
+                          ${op}
+                        </option>
+                      `,
+                    )}
+                  </select>
+                  <input
+                    type="number"
+                    class="text-input color-threshold-input"
+                    .value="${String(rule.value)}"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        value:
+                          parseFloat((e.target as HTMLInputElement).value) || 0,
+                      })}"
+                  />
+                  <div
+                    class="color-preview"
+                    style="background:${rule.color}"
+                  ></div>
+                  <input
+                    type="text"
+                    class="text-input color-color-input"
+                    .value="${rule.color}"
+                    placeholder="#f44336"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        color: (e.target as HTMLInputElement).value,
+                      })}"
+                  />
+                  <button
+                    class="remove-btn"
+                    @click="${() => this._removeColorRule(key, idx)}"
+                  >
+                    ✕
+                  </button>
+                </div>
+              `,
+            )}
+          </div>
+        `;
+      })}
 
       <div class="section-label">Visual Options</div>
       <label class="toggle-row">
@@ -708,6 +846,81 @@ export class GithubCardEditor extends LitElement {
         var(--primary-color, #0366d6) 14%,
         transparent
       );
+    }
+    .color-slot-block {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .color-slot-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .color-slot-label {
+      flex: 1;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--primary-text-color);
+    }
+    .add-color-btn {
+      padding: 3px 10px;
+      border: 1px dashed var(--primary-color, #0366d6);
+      border-radius: 5px;
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 6%,
+        transparent
+      );
+      color: var(--primary-color, #0366d6);
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .add-color-btn:hover {
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 14%,
+        transparent
+      );
+    }
+    .color-rule-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border: 1px solid var(--divider-color, #e1e4e8);
+      border-radius: 6px;
+      background: color-mix(
+        in srgb,
+        var(--primary-text-color, #000) 2%,
+        transparent
+      );
+    }
+    .color-op-select {
+      width: 60px;
+      flex-shrink: 0;
+      padding: 4px 4px;
+      font-size: 0.82rem;
+    }
+    .color-threshold-input {
+      width: 70px;
+      flex-shrink: 0;
+      padding: 4px 6px;
+      font-size: 0.82rem;
+    }
+    .color-color-input {
+      flex: 1;
+      padding: 4px 6px;
+      font-size: 0.82rem;
+    }
+    .color-preview {
+      width: 18px;
+      height: 18px;
+      border-radius: 3px;
+      flex-shrink: 0;
+      border: 1px solid var(--divider-color, #e1e4e8);
     }
   `;
 }
