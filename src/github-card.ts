@@ -5,7 +5,6 @@ import type {
   GithubCardConfig,
   GithubEntityData,
   SlotKey,
-  SlotColorRule,
 } from "./types/index.js";
 import {
   resolveGithubDevice,
