@@ -1,4 +1,4 @@
-import js from '@eslint/js';
+import js from '@eslint/js/src/index.js';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import eslintConfigPrettier from 'eslint-config-prettier';
