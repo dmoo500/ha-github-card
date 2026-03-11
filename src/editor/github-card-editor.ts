@@ -1,18 +1,21 @@
-import { LitElement, html, css, nothing } from 'lit';
-import { property, state } from 'lit/decorators.js';
-import type { HomeAssistant, GithubCardConfig, SlotKey } from '../types/index.js';
-import { getGithubEntities } from '../utils/github.js';
-
+import { LitElement, html, css, nothing } from "lit";
+import { property, state } from "lit/decorators.js";
+import type {
+  HomeAssistant,
+  GithubCardConfig,
+  SlotKey,
+} from "../types/index.js";
+import { getGithubEntities } from "../utils/github.js";
 
 const SLOT_OPTIONS: [SlotKey, string][] = [
-  ['watchers',      '👁  Watchers'],
-  ['stars',         '⭐ Stars'],
-  ['forks',         '🍴 Forks'],
-  ['issues',        '🐛 Issues'],
-  ['pull_requests', '🔀 Pull Requests'],
-  ['last_commit',   '🔗 Last Commit'],
-  ['last_release',  '🏷  Latest Release'],
-  ['none',          '— None —'],
+  ["watchers", "👁  Watchers"],
+  ["stars", "⭐ Stars"],
+  ["forks", "🍴 Forks"],
+  ["issues", "🐛 Issues"],
+  ["pull_requests", "🔀 Pull Requests"],
+  ["last_commit", "🔗 Last Commit"],
+  ["last_release", "🏷  Latest Release"],
+  ["none", "— None —"],
 ];
 
 /**
@@ -23,10 +26,10 @@ const SLOT_OPTIONS: [SlotKey, string][] = [
 export class GithubCardEditor extends LitElement {
   @property({ attribute: false }) public hass!: HomeAssistant;
   @state() private _config: GithubCardConfig | undefined = undefined;
-  @state() private _pickerValue = '';
+  @state() private _pickerValue = "";
 
   setConfig(config: GithubCardConfig): void {
-    console.debug('[ha-github-card] editor.setConfig called', config);
+    console.debug("[ha-github-card] editor.setConfig called", config);
     this._config = { ...config };
     this.requestUpdate();
   }
@@ -46,28 +49,35 @@ export class GithubCardEditor extends LitElement {
     // Works for both ha-entity-picker (CustomEvent detail.value) and standard <input> change
     const entityId: string =
       (e as CustomEvent).detail?.value ??
-      ((e.target as HTMLInputElement)?.value ?? '');
-    console.debug('[ha-github-card] editor._entityPicked — value:', entityId);
+      (e.target as HTMLInputElement)?.value ??
+      "";
+    console.debug("[ha-github-card] editor._entityPicked — value:", entityId);
     if (!entityId || !entityId.trim()) {
-      this._pickerValue = '';
+      this._pickerValue = "";
       return;
     }
     const current = this._config!.entities ?? [];
     if (!current.includes(entityId)) {
-      this._fireConfigChanged({ ...this._config!, entities: [...current, entityId] });
+      this._fireConfigChanged({
+        ...this._config!,
+        entities: [...current, entityId],
+      });
     }
-    this._pickerValue = '';
+    this._pickerValue = "";
   }
 
   private _addCurrentEntity(): void {
     const val = this._pickerValue.trim();
-    console.debug('[ha-github-card] editor._addCurrentEntity —', val);
+    console.debug("[ha-github-card] editor._addCurrentEntity —", val);
     if (!val) return;
     const current = this._config!.entities ?? [];
     if (!current.includes(val)) {
-      this._fireConfigChanged({ ...this._config!, entities: [...current, val] });
+      this._fireConfigChanged({
+        ...this._config!,
+        entities: [...current, val],
+      });
     }
-    this._pickerValue = '';
+    this._pickerValue = "";
   }
 
   private _setValue(key: keyof GithubCardConfig, value: unknown): void {
@@ -85,10 +95,14 @@ export class GithubCardEditor extends LitElement {
   }
 
   private _getRows(): SlotKey[][] {
-    if (this._config!.rows?.length) return this._config!.rows.map(r => [...r]);
+    if (this._config!.rows?.length)
+      return this._config!.rows.map((r) => [...r]);
     // migrate legacy format
-    const r0 = this._config!.row2_slots ?? (['watchers', 'stars', 'last_commit'] as SlotKey[]);
-    const r1 = this._config!.row3_slots ?? (['pull_requests', 'issues'] as SlotKey[]);
+    const r0 =
+      this._config!.row2_slots ??
+      (["watchers", "stars", "last_commit"] as SlotKey[]);
+    const r1 =
+      this._config!.row3_slots ?? (["pull_requests", "issues"] as SlotKey[]);
     return [[...r0], [...r1]];
   }
 
@@ -101,7 +115,7 @@ export class GithubCardEditor extends LitElement {
   private _setRowColCount(rowIdx: number, count: number): void {
     const rows = this._getRows();
     const row = rows[rowIdx];
-    while (row.length < count) row.push('none');
+    while (row.length < count) row.push("none");
     rows[rowIdx] = row.slice(0, count);
     this._fireConfigChanged({ ...this._config!, rows });
   }
@@ -109,22 +123,28 @@ export class GithubCardEditor extends LitElement {
   private _addRow(): void {
     const rows = this._getRows();
     if (rows.length >= 5) return;
-    this._fireConfigChanged({ ...this._config!, rows: [...rows, ['none' as SlotKey]] });
+    this._fireConfigChanged({
+      ...this._config!,
+      rows: [...rows, ["none" as SlotKey]],
+    });
   }
 
   private _removeRow(rowIdx: number): void {
     const rows = this._getRows();
-    this._fireConfigChanged({ ...this._config!, rows: rows.filter((_, i) => i !== rowIdx) });
+    this._fireConfigChanged({
+      ...this._config!,
+      rows: rows.filter((_, i) => i !== rowIdx),
+    });
   }
 
   private _fireConfigChanged(config: GithubCardConfig): void {
     this._config = config;
     this.dispatchEvent(
-      new CustomEvent('config-changed', {
+      new CustomEvent("config-changed", {
         detail: { config },
         bubbles: true,
         composed: true,
-      })
+      }),
     );
   }
 
@@ -133,9 +153,16 @@ export class GithubCardEditor extends LitElement {
   // ------------------------------------------------------------------
 
   render() {
-    console.debug('[ha-github-card] editor.render — hass:', !!this.hass, '| _config:', this._config);
+    console.debug(
+      "[ha-github-card] editor.render — hass:",
+      !!this.hass,
+      "| _config:",
+      this._config,
+    );
     if (!this._config) {
-      console.warn('[ha-github-card] editor.render — _config is not set yet, rendering nothing');
+      console.warn(
+        "[ha-github-card] editor.render — _config is not set yet, rendering nothing",
+      );
       return nothing;
     }
 
@@ -143,8 +170,17 @@ export class GithubCardEditor extends LitElement {
     const selectedEntities = cfg.entities ?? [];
     const rows = this._getRows();
     const githubEntities = this.hass ? getGithubEntities(this.hass) : [];
-    console.debug('[ha-github-card] editor.render — githubEntities found:', githubEntities.length, githubEntities);
-    console.debug('[ha-github-card] editor — ha-textfield defined:', !!customElements.get('ha-textfield'), '| ha-entity-picker defined:', !!customElements.get('ha-entity-picker'));
+    console.debug(
+      "[ha-github-card] editor.render — githubEntities found:",
+      githubEntities.length,
+      githubEntities,
+    );
+    console.debug(
+      "[ha-github-card] editor — ha-textfield defined:",
+      !!customElements.get("ha-textfield"),
+      "| ha-entity-picker defined:",
+      !!customElements.get("ha-entity-picker"),
+    );
 
     return html`
       <div class="field-group">
@@ -153,8 +189,9 @@ export class GithubCardEditor extends LitElement {
           id="card-title"
           type="text"
           class="text-input"
-          .value="${cfg.title ?? ''}"
-          @change="${(e: Event) => this._setValue('title', (e.target as HTMLInputElement).value)}"
+          .value="${cfg.title ?? ""}"
+          @change="${(e: Event) =>
+            this._setValue("title", (e.target as HTMLInputElement).value)}"
           placeholder="GitHub"
         />
       </div>
@@ -167,16 +204,22 @@ export class GithubCardEditor extends LitElement {
               ${selectedEntities.map((entityId) => {
                 const inStates = !!(this.hass && this.hass.states[entityId]);
                 return html`
-                  <div class="entity-row ${inStates ? '' : 'entity-warn'}">
+                  <div class="entity-row ${inStates ? "" : "entity-warn"}">
                     <span class="entity-id">${entityId}</span>
                     ${!inStates
-                      ? html`<span class="warn-icon" title="Entity not found in HA — check ID">⚠</span>`
+                      ? html`<span
+                          class="warn-icon"
+                          title="Entity not found in HA — check ID"
+                          >⚠</span
+                        >`
                       : nothing}
                     <button
                       class="remove-btn"
                       @click="${() => this._removeEntity(entityId)}"
                       aria-label="Remove"
-                    >✕</button>
+                    >
+                      ✕
+                    </button>
                   </div>
                 `;
               })}
@@ -194,55 +237,81 @@ export class GithubCardEditor extends LitElement {
           list="github-entity-list"
           placeholder="sensor.myrepo_watchers_count"
           .value="${this._pickerValue}"
-          @input="${(e: Event) => { this._pickerValue = (e.target as HTMLInputElement).value; }}"
+          @input="${(e: Event) => {
+            this._pickerValue = (e.target as HTMLInputElement).value;
+          }}"
           @change="${this._entityPicked}"
         />
         <button class="add-btn" @click="${this._addCurrentEntity}">Add</button>
       </div>
       <p class="hint">
         ${githubEntities.length > 0
-          ? html`${githubEntities.length} GitHub entities available — pick from list or type any entity ID.`
-          : html`No GitHub entities auto-detected. Type the entity ID manually (e.g. <em>sensor.owner_repo_watchers_count</em>).`}
+          ? html`${githubEntities.length} GitHub entities available — pick from
+            list or type any entity ID.`
+          : html`No GitHub entities auto-detected. Type the entity ID manually
+              (e.g. <em>sensor.owner_repo_watchers_count</em>).`}
       </p>
 
       <div class="section-label">Rows — ${rows.length} / 5</div>
 
-      ${rows.map((row, rowIdx) => html`
-        <div class="row-block">
-          <div class="row-block-header">
-            <span class="row-block-title">Row ${rowIdx + 1}</span>
-            <div class="col-count-btns">
-              <span class="col-count-label">Cols:</span>
-              ${[1, 2, 3].map(n => html`
-                <button
-                  class="col-count-btn ${row.length === n ? 'active' : ''}"
-                  @click="${() => this._setRowColCount(rowIdx, n)}"
-                >${n}</button>
-              `)}
+      ${rows.map(
+        (row, rowIdx) => html`
+          <div class="row-block">
+            <div class="row-block-header">
+              <span class="row-block-title">Row ${rowIdx + 1}</span>
+              <div class="col-count-btns">
+                <span class="col-count-label">Cols:</span>
+                ${[1, 2, 3].map(
+                  (n) => html`
+                    <button
+                      class="col-count-btn ${row.length === n ? "active" : ""}"
+                      @click="${() => this._setRowColCount(rowIdx, n)}"
+                    >
+                      ${n}
+                    </button>
+                  `,
+                )}
+              </div>
+              <button
+                class="remove-btn row-remove-btn"
+                @click="${() => this._removeRow(rowIdx)}"
+                aria-label="Remove row"
+                ?disabled="${rows.length <= 1}"
+              >
+                ✕
+              </button>
             </div>
-            <button
-              class="remove-btn row-remove-btn"
-              @click="${() => this._removeRow(rowIdx)}"
-              aria-label="Remove row"
-              ?disabled="${rows.length <= 1}"
-            >✕</button>
+            <div class="slot-row">
+              ${row.map((slot, colIdx) =>
+                this._renderSlotSelect(
+                  rowIdx,
+                  colIdx,
+                  slot,
+                  `Col ${colIdx + 1}`,
+                ),
+              )}
+            </div>
           </div>
-          <div class="slot-row">
-            ${row.map((slot, colIdx) => this._renderSlotSelect(rowIdx, colIdx, slot, `Col ${colIdx + 1}`))}
-          </div>
-        </div>
-      `)}
-
-      ${rows.length < 5 ? html`
-        <button class="add-row-btn" @click="${() => this._addRow()}">+ Add Row</button>
-      ` : nothing}
+        `,
+      )}
+      ${rows.length < 5
+        ? html`
+            <button class="add-row-btn" @click="${() => this._addRow()}">
+              + Add Row
+            </button>
+          `
+        : nothing}
 
       <div class="section-label">Visual Options</div>
       <label class="toggle-row">
         <input
           type="checkbox"
           .checked="${cfg.show_header !== false}"
-          @change="${(e: Event) => this._setValue('show_header', (e.target as HTMLInputElement).checked)}"
+          @change="${(e: Event) =>
+            this._setValue(
+              "show_header",
+              (e.target as HTMLInputElement).checked,
+            )}"
         />
         Show Card Header (title bar)
       </label>
@@ -250,7 +319,11 @@ export class GithubCardEditor extends LitElement {
         <input
           type="checkbox"
           .checked="${cfg.show_header_icon !== false}"
-          @change="${(e: Event) => this._setValue('show_header_icon', (e.target as HTMLInputElement).checked)}"
+          @change="${(e: Event) =>
+            this._setValue(
+              "show_header_icon",
+              (e.target as HTMLInputElement).checked,
+            )}"
         />
         Show GitHub Icon in Header
       </label>
@@ -258,7 +331,11 @@ export class GithubCardEditor extends LitElement {
         <input
           type="checkbox"
           .checked="${cfg.show_avatar !== false}"
-          @change="${(e: Event) => this._setValue('show_avatar', (e.target as HTMLInputElement).checked)}"
+          @change="${(e: Event) =>
+            this._setValue(
+              "show_avatar",
+              (e.target as HTMLInputElement).checked,
+            )}"
         />
         Show Owner Avatar
       </label>
@@ -266,7 +343,8 @@ export class GithubCardEditor extends LitElement {
         <input
           type="checkbox"
           .checked="${!!cfg.compact}"
-          @change="${(e: Event) => this._setValue('compact', (e.target as HTMLInputElement).checked)}"
+          @change="${(e: Event) =>
+            this._setValue("compact", (e.target as HTMLInputElement).checked)}"
         />
         Compact Layout
       </label>
@@ -277,38 +355,54 @@ export class GithubCardEditor extends LitElement {
     rowIdx: number,
     colIdx: number,
     current: SlotKey,
-    label: string
+    label: string,
   ) {
-    const iconOverride = this._config!.icons?.[current] ?? '';
+    const iconOverride = this._config!.icons?.[current] ?? "";
     return html`
       <div class="slot-select-wrap">
         <span class="slot-col-label">${label}</span>
         <select
           @change="${(e: Event) =>
-            this._setRowSlot(rowIdx, colIdx, (e.target as HTMLSelectElement).value as SlotKey)}"
+            this._setRowSlot(
+              rowIdx,
+              colIdx,
+              (e.target as HTMLSelectElement).value as SlotKey,
+            )}"
         >
           ${SLOT_OPTIONS.map(
             ([key, optLabel]) => html`
-              <option value="${key}" ?selected="${key === current}">${optLabel}</option>
-            `
+              <option value="${key}" ?selected="${key === current}">
+                ${optLabel}
+              </option>
+            `,
           )}
         </select>
-        ${current !== 'none' ? html`
-          <div class="icon-override-row">
-            ${iconOverride
-              ? html`<ha-icon class="icon-preview" .icon="${iconOverride}"></ha-icon>`
-              : html`<span class="icon-preview-placeholder">&#xFFFD;</span>`}
-            <input
-              type="text"
-              class="text-input icon-input"
-              placeholder="mdi:star"
-              .value="${iconOverride}"
-              title="Override icon (leave empty to use sensor default)"
-              @change="${(e: Event) =>
-                this._setSlotIcon(current, (e.target as HTMLInputElement).value)}"
-            />
-          </div>
-        ` : nothing}
+        ${current !== "none"
+          ? html`
+              <div class="icon-override-row">
+                ${iconOverride
+                  ? html`<ha-icon
+                      class="icon-preview"
+                      .icon="${iconOverride}"
+                    ></ha-icon>`
+                  : html`<span class="icon-preview-placeholder"
+                      >&#xFFFD;</span
+                    >`}
+                <input
+                  type="text"
+                  class="text-input icon-input"
+                  placeholder="mdi:star"
+                  .value="${iconOverride}"
+                  title="Override icon (leave empty to use sensor default)"
+                  @change="${(e: Event) =>
+                    this._setSlotIcon(
+                      current,
+                      (e.target as HTMLInputElement).value,
+                    )}"
+                />
+              </div>
+            `
+          : nothing}
       </div>
     `;
   }
@@ -338,7 +432,11 @@ export class GithubCardEditor extends LitElement {
       margin: 0;
       line-height: 1.5;
     }
-    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
     .field-label {
       font-size: 0.75rem;
       font-weight: 600;
@@ -360,9 +458,14 @@ export class GithubCardEditor extends LitElement {
     .text-input:focus {
       outline: none;
       border-color: var(--primary-color, #0366d6);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color, #0366d6) 20%, transparent);
+      box-shadow: 0 0 0 2px
+        color-mix(in srgb, var(--primary-color, #0366d6) 20%, transparent);
     }
-    .entity-list { display: flex; flex-direction: column; gap: 4px; }
+    .entity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
     .entity-row {
       display: flex;
       align-items: center;
@@ -370,14 +473,32 @@ export class GithubCardEditor extends LitElement {
       padding: 6px 8px 6px 12px;
       border: 1px solid var(--primary-color, #0366d6);
       border-radius: 6px;
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 6%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 6%,
+        transparent
+      );
     }
     .entity-row.entity-warn {
       border-color: var(--warning-color, #f59e0b);
-      background: color-mix(in srgb, var(--warning-color, #f59e0b) 8%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--warning-color, #f59e0b) 8%,
+        transparent
+      );
     }
-    .entity-id { flex: 1; font-size: 0.85rem; color: var(--primary-text-color); word-break: break-all; }
-    .warn-icon { color: var(--warning-color, #f59e0b); font-size: 1rem; cursor: help; flex-shrink: 0; }
+    .entity-id {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--primary-text-color);
+      word-break: break-all;
+    }
+    .warn-icon {
+      color: var(--warning-color, #f59e0b);
+      font-size: 1rem;
+      cursor: help;
+      flex-shrink: 0;
+    }
     .remove-btn {
       flex-shrink: 0;
       background: none;
@@ -389,9 +510,23 @@ export class GithubCardEditor extends LitElement {
       border-radius: 4px;
       line-height: 1;
     }
-    .remove-btn:hover { background: color-mix(in srgb, var(--error-color, #f44336) 12%, transparent); color: var(--error-color, #f44336); }
-    .add-entity-row { display: flex; gap: 8px; align-items: center; }
-    .entity-input { flex: 1; margin-bottom: 0; }
+    .remove-btn:hover {
+      background: color-mix(
+        in srgb,
+        var(--error-color, #f44336) 12%,
+        transparent
+      );
+      color: var(--error-color, #f44336);
+    }
+    .add-entity-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .entity-input {
+      flex: 1;
+      margin-bottom: 0;
+    }
     .add-btn {
       flex-shrink: 0;
       padding: 8px 16px;
@@ -405,9 +540,20 @@ export class GithubCardEditor extends LitElement {
       white-space: nowrap;
       font-family: inherit;
     }
-    .add-btn:hover { opacity: 0.88; }
-    .slot-row { display: flex; gap: 8px; }
-    .slot-select-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .add-btn:hover {
+      opacity: 0.88;
+    }
+    .slot-row {
+      display: flex;
+      gap: 8px;
+    }
+    .slot-select-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
     .slot-col-label {
       font-size: 0.72rem;
       font-weight: 700;
@@ -426,7 +572,10 @@ export class GithubCardEditor extends LitElement {
       cursor: pointer;
       font-family: inherit;
     }
-    select:focus { outline: none; border-color: var(--primary-color, #0366d6); }
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color, #0366d6);
+    }
     .icon-override-row {
       display: flex;
       align-items: center;
@@ -451,7 +600,10 @@ export class GithubCardEditor extends LitElement {
       color: var(--secondary-text-color);
       opacity: 0.4;
     }
-    .icon-input { font-size: 0.75rem; padding: 4px 6px; }
+    .icon-input {
+      font-size: 0.75rem;
+      padding: 4px 6px;
+    }
     .toggle-row {
       display: flex;
       align-items: center;
@@ -473,7 +625,11 @@ export class GithubCardEditor extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      background: color-mix(in srgb, var(--primary-text-color, #000) 2%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-text-color, #000) 2%,
+        transparent
+      );
     }
     .row-block-header {
       display: flex;
@@ -511,26 +667,47 @@ export class GithubCardEditor extends LitElement {
       font-family: inherit;
       padding: 0;
     }
-    .col-count-btn:hover { background: color-mix(in srgb, var(--primary-color, #0366d6) 10%, transparent); }
+    .col-count-btn:hover {
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 10%,
+        transparent
+      );
+    }
     .col-count-btn.active {
       background: var(--primary-color, #0366d6);
       color: var(--text-primary-color, #fff);
       border-color: var(--primary-color, #0366d6);
     }
-    .row-remove-btn { padding: 2px 6px; }
-    .row-remove-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .row-remove-btn {
+      padding: 2px 6px;
+    }
+    .row-remove-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
     .add-row-btn {
       align-self: flex-start;
       padding: 7px 14px;
       border: 1px dashed var(--primary-color, #0366d6);
       border-radius: 6px;
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 6%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 6%,
+        transparent
+      );
       color: var(--primary-color, #0366d6);
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       font-family: inherit;
     }
-    .add-row-btn:hover { background: color-mix(in srgb, var(--primary-color, #0366d6) 14%, transparent); }
+    .add-row-btn:hover {
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 14%,
+        transparent
+      );
+    }
   `;
 }
