@@ -241,7 +241,7 @@ export class GithubCard extends LitElement {
       if (match)
         return rule.type === "background"
           ? `background-color: ${rule.color}; border-radius: 4px; padding: 0 4px;`
-          : `color: ${rule.color};`;
+          : `--slot-color-override: ${rule.color};`;
     }
     return "";
   }
@@ -490,13 +490,13 @@ export class GithubCard extends LitElement {
 
     .slot-value {
       font-weight: 700;
-      color: var(--gh-text);
+      color: var(--slot-color-override, var(--gh-text));
       flex-shrink: 0;
     }
 
     .slot-label {
       font-size: 0.72rem;
-      color: var(--gh-text-sec);
+      color: var(--slot-color-override, var(--gh-text-sec));
       opacity: 0.8;
       overflow: hidden;
       text-overflow: ellipsis;

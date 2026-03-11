@@ -922,7 +922,7 @@ const R = [
     if (i === void 0) return "";
     for (const c of s)
       if (c.op === ">" ? i > c.value : c.op === ">=" ? i >= c.value : c.op === "<" ? i < c.value : c.op === "<=" ? i <= c.value : i === c.value)
-        return c.type === "background" ? `background-color: ${c.color}; border-radius: 4px; padding: 0 4px;` : `color: ${c.color};`;
+        return c.type === "background" ? `background-color: ${c.color}; border-radius: 4px; padding: 0 4px;` : `--slot-color-override: ${c.color};`;
     return "";
   }
   _slotIcon(e, t) {
@@ -1156,13 +1156,13 @@ const R = [
 
     .slot-value {
       font-weight: 700;
-      color: var(--gh-text);
+      color: var(--slot-color-override, var(--gh-text));
       flex-shrink: 0;
     }
 
     .slot-label {
       font-size: 0.72rem;
-      color: var(--gh-text-sec);
+      color: var(--slot-color-override, var(--gh-text-sec));
       opacity: 0.8;
       overflow: hidden;
       text-overflow: ellipsis;
