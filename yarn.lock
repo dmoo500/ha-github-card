@@ -208,6 +208,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint/js@npm:^10.0.1":
+  version: 10.0.1
+  resolution: "@eslint/js@npm:10.0.1"
+  peerDependencies:
+    eslint: ^10.0.0
+  peerDependenciesMeta:
+    eslint:
+      optional: true
+  checksum: 10/27ff77b8f0aab350b2f7a69d974eabb816bb9f4cab986b1538782269d6bfdc29e351803fa7a62c22c0b786341324f1a28b86bc83956ddfa189aa6bead1a87758
+  languageName: node
+  linkType: hard
+
 "@gar/promise-retry@npm:^1.0.0":
   version: 1.0.2
   resolution: "@gar/promise-retry@npm:1.0.2"
@@ -1381,6 +1393,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ha-github-card@workspace:."
   dependencies:
+    "@eslint/js": "npm:^10.0.1"
     "@typescript-eslint/eslint-plugin": "npm:^8.57.0"
     "@typescript-eslint/parser": "npm:^6.0.0"
     eslint: "npm:^8.0.0"
@@ -1389,6 +1402,7 @@ __metadata:
     prettier: "npm:^3.0.0"
     typescript: "npm:^5.0.0"
     vite: "npm:^5.0.0"
+    yarn.lock: "npm:^0.0.1-security"
   languageName: unknown
   linkType: soft
 
@@ -2452,6 +2466,13 @@ __metadata:
   version: 5.0.0
   resolution: "yallist@npm:5.0.0"
   checksum: 10/1884d272d485845ad04759a255c71775db0fac56308764b4c77ea56a20d56679fad340213054c8c9c9c26fcfd4c4b2a90df993b7e0aaf3cdb73c618d1d1a802a
+  languageName: node
+  linkType: hard
+
+"yarn.lock@npm:^0.0.1-security":
+  version: 0.0.1-security
+  resolution: "yarn.lock@npm:0.0.1-security"
+  checksum: 10/247a60a82cb355617a26b49fe9097154ed3ab325116897a6bc7e6794984e96856d4a612d9e5e1854859b5338e95c0d8f53a87436f3455189e927a3679ff43bbe
   languageName: node
   linkType: hard
 
