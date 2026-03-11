@@ -35,7 +35,7 @@ jobs:
         echo "VERSION=${REF#v}" >> $GITHUB_OUTPUT
 
     - name: Update version in package.json
-      run: yarn version ${{ steps.version.outputs.VERSION }} --immediate
+      run: npm pkg set version=${{ steps.version.outputs.VERSION }}
 
     - name: Create release archive
       id: create_release
