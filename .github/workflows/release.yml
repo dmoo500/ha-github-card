@@ -4,6 +4,7 @@ on:
   push:
     tags:
       - 'v*'
+      - '[0-9]*'
 
 jobs:
   release:
@@ -29,7 +30,9 @@ jobs:
 
     - name: Get version from tag
       id: version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+      run: |
+        REF="${GITHUB_REF#refs/tags/}"
+        echo "VERSION=${REF#v}" >> $GITHUB_OUTPUT
 
     - name: Update version in package.json
       run: yarn version ${{ steps.version.outputs.VERSION }} --immediate
