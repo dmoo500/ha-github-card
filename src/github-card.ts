@@ -198,7 +198,10 @@ export class GithubCard extends LitElement {
                 >
                   ${row.map(
                     (s) => html`
-                      <div class="slot-cell" style="${this._slotColor(s, entity)}">
+                      <div
+                        class="slot-cell"
+                        style="${this._slotColor(s, entity)}"
+                      >
                         ${this._renderSlot(s, entity)}
                       </div>
                     `,
@@ -216,24 +219,29 @@ export class GithubCard extends LitElement {
     if (!rules?.length) return "";
     const a = entity.attributes;
     const numericValue: Record<string, number | undefined> = {
-      stars:         a.stargazers_count,
-      forks:         a.forks_count,
-      watchers:      a.watchers_count,
-      issues:        a.open_issues_count,
+      stars: a.stargazers_count,
+      forks: a.forks_count,
+      watchers: a.watchers_count,
+      issues: a.open_issues_count,
       pull_requests: a.open_pull_requests_count,
     };
     const val = numericValue[key];
     if (val === undefined) return "";
     for (const rule of rules) {
       const match =
-        rule.op === ">"  ? val >  rule.value :
-        rule.op === ">=" ? val >= rule.value :
-        rule.op === "<"  ? val <  rule.value :
-        rule.op === "<=" ? val <= rule.value :
-                           val === rule.value;
-      if (match) return rule.type === "background"
-        ? `background-color: ${rule.color}; border-radius: 4px; padding: 0 4px;`
-        : `color: ${rule.color};`;
+        rule.op === ">"
+          ? val > rule.value
+          : rule.op === ">="
+            ? val >= rule.value
+            : rule.op === "<"
+              ? val < rule.value
+              : rule.op === "<="
+                ? val <= rule.value
+                : val === rule.value;
+      if (match)
+        return rule.type === "background"
+          ? `background-color: ${rule.color}; border-radius: 4px; padding: 0 4px;`
+          : `color: ${rule.color};`;
     }
     return "";
   }

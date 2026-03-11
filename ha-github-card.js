@@ -896,7 +896,10 @@ const R = [
                 >
                   ${r.map(
       (n) => u`
-                      <div class="slot-cell" style="${this._slotColor(n, e)}">
+                      <div
+                        class="slot-cell"
+                        style="${this._slotColor(n, e)}"
+                      >
                         ${this._renderSlot(n, e)}
                       </div>
                     `
@@ -918,7 +921,8 @@ const R = [
     }[e];
     if (i === void 0) return "";
     for (const c of s)
-      if (c.op === ">" ? i > c.value : c.op === ">=" ? i >= c.value : c.op === "<" ? i < c.value : c.op === "<=" ? i <= c.value : i === c.value) return c.type === "background" ? `background-color: ${c.color}; border-radius: 4px; padding: 0 4px;` : `color: ${c.color};`;
+      if (c.op === ">" ? i > c.value : c.op === ">=" ? i >= c.value : c.op === "<" ? i < c.value : c.op === "<=" ? i <= c.value : i === c.value)
+        return c.type === "background" ? `background-color: ${c.color}; border-radius: 4px; padding: 0 4px;` : `color: ${c.color};`;
     return "";
   }
   _slotIcon(e, t) {
@@ -1320,7 +1324,12 @@ class j extends y {
   }
   _addColorRule(e) {
     const t = { ...this._config.slot_colors ?? {} }, s = [...t[e] ?? []];
-    s.push({ op: ">=", value: 0, color: "var(--error-color, #f44336)", type: "text" }), t[e] = s, this._fireConfigChanged({ ...this._config, slot_colors: t });
+    s.push({
+      op: ">=",
+      value: 0,
+      color: "var(--error-color, #f44336)",
+      type: "text"
+    }), t[e] = s, this._fireConfigChanged({ ...this._config, slot_colors: t });
   }
   _removeColorRule(e, t) {
     const s = { ...this._config.slot_colors ?? {} }, r = [...s[e] ?? []].filter((n, i) => i !== t);
@@ -1486,42 +1495,79 @@ class j extends y {
           <div class="color-slot-block">
             <div class="color-slot-header">
               <span class="color-slot-label">${i}</span>
-              <button class="add-color-btn" @click="${() => this._addColorRule(n)}">+ Rule</button>
+              <button
+                class="add-color-btn"
+                @click="${() => this._addColorRule(n)}"
+              >
+                + Rule
+              </button>
             </div>
-            ${c.map((h, a) => u`
-              <div class="color-rule-row">
-                <select
-                  class="color-type-select"
-                  @change="${(d) => this._updateColorRule(n, a, { type: d.target.value })}"
-                >
-                  <option value="text" ?selected="${h.type !== "background"}">Text</option>
-                  <option value="background" ?selected="${h.type === "background"}">BG</option>
-                </select>
-                <select
-                  class="color-op-select"
-                  @change="${(d) => this._updateColorRule(n, a, { op: d.target.value })}"
-                >
-                  ${[">", ">=", "<", "<=", "=="].map((d) => u`
-                    <option value="${d}" ?selected="${h.op === d}">${d}</option>
-                  `)}
-                </select>
-                <input
-                  type="number"
-                  class="text-input color-threshold-input"
-                  .value="${String(h.value)}"
-                  @change="${(d) => this._updateColorRule(n, a, { value: parseFloat(d.target.value) || 0 })}"
-                />
-                <div class="color-preview" style="background:${h.color}"></div>
-                <input
-                  type="text"
-                  class="text-input color-color-input"
-                  .value="${h.color}"
-                  placeholder="#f44336"
-                  @change="${(d) => this._updateColorRule(n, a, { color: d.target.value })}"
-                />
-                <button class="remove-btn" @click="${() => this._removeColorRule(n, a)}">✕</button>
-              </div>
-            `)}
+            ${c.map(
+        (h, a) => u`
+                <div class="color-rule-row">
+                  <select
+                    class="color-type-select"
+                    @change="${(d) => this._updateColorRule(n, a, {
+          type: d.target.value
+        })}"
+                  >
+                    <option
+                      value="text"
+                      ?selected="${h.type !== "background"}"
+                    >
+                      Text
+                    </option>
+                    <option
+                      value="background"
+                      ?selected="${h.type === "background"}"
+                    >
+                      BG
+                    </option>
+                  </select>
+                  <select
+                    class="color-op-select"
+                    @change="${(d) => this._updateColorRule(n, a, {
+          op: d.target.value
+        })}"
+                  >
+                    ${[">", ">=", "<", "<=", "=="].map(
+          (d) => u`
+                        <option value="${d}" ?selected="${h.op === d}">
+                          ${d}
+                        </option>
+                      `
+        )}
+                  </select>
+                  <input
+                    type="number"
+                    class="text-input color-threshold-input"
+                    .value="${String(h.value)}"
+                    @change="${(d) => this._updateColorRule(n, a, {
+          value: parseFloat(d.target.value) || 0
+        })}"
+                  />
+                  <div
+                    class="color-preview"
+                    style="background:${h.color}"
+                  ></div>
+                  <input
+                    type="text"
+                    class="text-input color-color-input"
+                    .value="${h.color}"
+                    placeholder="#f44336"
+                    @change="${(d) => this._updateColorRule(n, a, {
+          color: d.target.value
+        })}"
+                  />
+                  <button
+                    class="remove-btn"
+                    @click="${() => this._removeColorRule(n, a)}"
+                  >
+                    ✕
+                  </button>
+                </div>
+              `
+      )}
           </div>
         `;
     })}
@@ -1935,7 +1981,11 @@ class j extends y {
       padding: 3px 10px;
       border: 1px dashed var(--primary-color, #0366d6);
       border-radius: 5px;
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 6%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 6%,
+        transparent
+      );
       color: var(--primary-color, #0366d6);
       font-size: 0.78rem;
       font-weight: 600;
@@ -1943,7 +1993,11 @@ class j extends y {
       font-family: inherit;
     }
     .add-color-btn:hover {
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 14%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 14%,
+        transparent
+      );
     }
     .color-rule-row {
       display: flex;
@@ -1952,7 +2006,11 @@ class j extends y {
       padding: 4px 8px;
       border: 1px solid var(--divider-color, #e1e4e8);
       border-radius: 6px;
-      background: color-mix(in srgb, var(--primary-text-color, #000) 2%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-text-color, #000) 2%,
+        transparent
+      );
     }
     .color-op-select {
       width: 60px;

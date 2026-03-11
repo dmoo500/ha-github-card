@@ -141,7 +141,12 @@ export class GithubCardEditor extends LitElement {
   private _addColorRule(key: SlotKey): void {
     const slot_colors = { ...(this._config!.slot_colors ?? {}) };
     const rules = [...(slot_colors[key] ?? [])];
-    rules.push({ op: ">=", value: 0, color: "var(--error-color, #f44336)", type: "text" });
+    rules.push({
+      op: ">=",
+      value: 0,
+      color: "var(--error-color, #f44336)",
+      type: "text",
+    });
     slot_colors[key] = rules;
     this._fireConfigChanged({ ...this._config!, slot_colors });
   }
@@ -335,54 +340,102 @@ export class GithubCardEditor extends LitElement {
         : nothing}
 
       <div class="section-label">Conditional Colors</div>
-      ${([
-        ["stars",         "Stars"],
-        ["forks",         "Forks"],
-        ["watchers",      "Watchers"],
-        ["issues",        "Issues"],
-        ["pull_requests", "Pull Requests"],
-      ] as [SlotKey, string][]).map(([key, label]) => {
+      ${(
+        [
+          ["stars", "Stars"],
+          ["forks", "Forks"],
+          ["watchers", "Watchers"],
+          ["issues", "Issues"],
+          ["pull_requests", "Pull Requests"],
+        ] as [SlotKey, string][]
+      ).map(([key, label]) => {
         const rules = cfg.slot_colors?.[key] ?? [];
         return html`
           <div class="color-slot-block">
             <div class="color-slot-header">
               <span class="color-slot-label">${label}</span>
-              <button class="add-color-btn" @click="${() => this._addColorRule(key)}">+ Rule</button>
+              <button
+                class="add-color-btn"
+                @click="${() => this._addColorRule(key)}"
+              >
+                + Rule
+              </button>
             </div>
-            ${rules.map((rule, idx) => html`
-              <div class="color-rule-row">
-                <select
-                  class="color-type-select"
-                  @change="${(e: Event) => this._updateColorRule(key, idx, { type: (e.target as HTMLSelectElement).value as SlotColorRule['type'] })}"
-                >
-                  <option value="text" ?selected="${rule.type !== 'background'}">Text</option>
-                  <option value="background" ?selected="${rule.type === 'background'}">BG</option>
-                </select>
-                <select
-                  class="color-op-select"
-                  @change="${(e: Event) => this._updateColorRule(key, idx, { op: (e.target as HTMLSelectElement).value as SlotColorRule['op'] })}"
-                >
-                  ${([">", ">=", "<", "<=", "=="] as SlotColorRule['op'][]).map(op => html`
-                    <option value="${op}" ?selected="${rule.op === op}">${op}</option>
-                  `)}
-                </select>
-                <input
-                  type="number"
-                  class="text-input color-threshold-input"
-                  .value="${String(rule.value)}"
-                  @change="${(e: Event) => this._updateColorRule(key, idx, { value: parseFloat((e.target as HTMLInputElement).value) || 0 })}"
-                />
-                <div class="color-preview" style="background:${rule.color}"></div>
-                <input
-                  type="text"
-                  class="text-input color-color-input"
-                  .value="${rule.color}"
-                  placeholder="#f44336"
-                  @change="${(e: Event) => this._updateColorRule(key, idx, { color: (e.target as HTMLInputElement).value })}"
-                />
-                <button class="remove-btn" @click="${() => this._removeColorRule(key, idx)}">✕</button>
-              </div>
-            `)}
+            ${rules.map(
+              (rule, idx) => html`
+                <div class="color-rule-row">
+                  <select
+                    class="color-type-select"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        type: (e.target as HTMLSelectElement)
+                          .value as SlotColorRule["type"],
+                      })}"
+                  >
+                    <option
+                      value="text"
+                      ?selected="${rule.type !== "background"}"
+                    >
+                      Text
+                    </option>
+                    <option
+                      value="background"
+                      ?selected="${rule.type === "background"}"
+                    >
+                      BG
+                    </option>
+                  </select>
+                  <select
+                    class="color-op-select"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        op: (e.target as HTMLSelectElement)
+                          .value as SlotColorRule["op"],
+                      })}"
+                  >
+                    ${(
+                      [">", ">=", "<", "<=", "=="] as SlotColorRule["op"][]
+                    ).map(
+                      (op) => html`
+                        <option value="${op}" ?selected="${rule.op === op}">
+                          ${op}
+                        </option>
+                      `,
+                    )}
+                  </select>
+                  <input
+                    type="number"
+                    class="text-input color-threshold-input"
+                    .value="${String(rule.value)}"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        value:
+                          parseFloat((e.target as HTMLInputElement).value) || 0,
+                      })}"
+                  />
+                  <div
+                    class="color-preview"
+                    style="background:${rule.color}"
+                  ></div>
+                  <input
+                    type="text"
+                    class="text-input color-color-input"
+                    .value="${rule.color}"
+                    placeholder="#f44336"
+                    @change="${(e: Event) =>
+                      this._updateColorRule(key, idx, {
+                        color: (e.target as HTMLInputElement).value,
+                      })}"
+                  />
+                  <button
+                    class="remove-btn"
+                    @click="${() => this._removeColorRule(key, idx)}"
+                  >
+                    ✕
+                  </button>
+                </div>
+              `,
+            )}
           </div>
         `;
       })}
@@ -814,7 +867,11 @@ export class GithubCardEditor extends LitElement {
       padding: 3px 10px;
       border: 1px dashed var(--primary-color, #0366d6);
       border-radius: 5px;
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 6%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 6%,
+        transparent
+      );
       color: var(--primary-color, #0366d6);
       font-size: 0.78rem;
       font-weight: 600;
@@ -822,7 +879,11 @@ export class GithubCardEditor extends LitElement {
       font-family: inherit;
     }
     .add-color-btn:hover {
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 14%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 14%,
+        transparent
+      );
     }
     .color-rule-row {
       display: flex;
@@ -831,7 +892,11 @@ export class GithubCardEditor extends LitElement {
       padding: 4px 8px;
       border: 1px solid var(--divider-color, #e1e4e8);
       border-radius: 6px;
-      background: color-mix(in srgb, var(--primary-text-color, #000) 2%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-text-color, #000) 2%,
+        transparent
+      );
     }
     .color-op-select {
       width: 60px;
