@@ -1,9 +1,4 @@
-/**
- * @license
- * Copyright 2019 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
-const T = globalThis, V = T.ShadowRoot && (T.ShadyCSS === void 0 || T.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, W = Symbol(), Y = /* @__PURE__ */ new WeakMap();
+const T = globalThis, V = T.ShadowRoot && (T.ShadyCSS === void 0 || T.ShadyCSS.nativeShadow) && "adoptedStyleSheets" in Document.prototype && "replace" in CSSStyleSheet.prototype, W = /* @__PURE__ */ Symbol(), Y = /* @__PURE__ */ new WeakMap();
 let he = class {
   constructor(e, t, s) {
     if (this._$cssResult$ = !0, s !== W) throw Error("CSSResult is not constructable. Use `unsafeCSS` or `css` instead.");
@@ -40,11 +35,6 @@ const be = (i) => new he(typeof i == "string" ? i : i + "", void 0, W), de = (i,
   for (const s of e.cssRules) t += s.cssText;
   return be(t);
 })(i) : i;
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 const { is: we, defineProperty: ye, getOwnPropertyDescriptor: xe, getOwnPropertyNames: Ae, getOwnPropertySymbols: ke, getPrototypeOf: Ce } = Object, L = globalThis, te = L.trustedTypes, Ee = te ? te.emptyScript : "", Se = L.reactiveElementPolyfillSupport, O = (i, e) => i, N = { toAttribute(i, e) {
   switch (e) {
     case Boolean:
@@ -74,7 +64,7 @@ const { is: we, defineProperty: ye, getOwnPropertyDescriptor: xe, getOwnProperty
   }
   return t;
 } }, F = (i, e) => !we(i, e), se = { attribute: !0, type: String, converter: N, reflect: !1, useDefault: !1, hasChanged: F };
-Symbol.metadata ??= Symbol("metadata"), L.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
+Symbol.metadata ??= /* @__PURE__ */ Symbol("metadata"), L.litPropertyMetadata ??= /* @__PURE__ */ new WeakMap();
 let y = class extends HTMLElement {
   static addInitializer(e) {
     this._$Ei(), (this.l ??= []).push(e);
@@ -84,7 +74,7 @@ let y = class extends HTMLElement {
   }
   static createProperty(e, t = se) {
     if (t.state && (t.attribute = !1), this._$Ei(), this.prototype.hasOwnProperty(e) && ((t = Object.create(t)).wrapped = !0), this.elementProperties.set(e, t), !t.noAccessor) {
-      const s = Symbol(), r = this.getPropertyDescriptor(e, s, t);
+      const s = /* @__PURE__ */ Symbol(), r = this.getPropertyDescriptor(e, s, t);
       r !== void 0 && ye(this.prototype, e, r);
     }
   }
@@ -257,14 +247,9 @@ let y = class extends HTMLElement {
   }
 };
 y.elementStyles = [], y.shadowRootOptions = { mode: "open" }, y[O("elementProperties")] = /* @__PURE__ */ new Map(), y[O("finalized")] = /* @__PURE__ */ new Map(), Se?.({ ReactiveElement: y }), (L.reactiveElementVersions ??= []).push("2.1.2");
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 const I = globalThis, re = (i) => i, M = I.trustedTypes, ie = M ? M.createPolicy("lit-html", { createHTML: (i) => i }) : void 0, ue = "$lit$", m = `lit$${Math.random().toFixed(9).slice(2)}$`, pe = "?" + m, Pe = `<${pe}>`, w = document, R = () => w.createComment(""), z = (i) => i === null || typeof i != "object" && typeof i != "function", B = Array.isArray, Oe = (i) => B(i) || typeof i?.[Symbol.iterator] == "function", G = `[ 	
 \f\r]`, E = /<(?:(!--|\/[^a-zA-Z])|(\/?[a-zA-Z][^>\s]*)|(\/?$))/g, oe = /-->/g, ne = />/g, b = RegExp(`>|${G}(?:([^\\s"'>=/]+)(${G}*=${G}*(?:[^ 	
-\f\r"'\`<>=]|("|')|))|$)`, "g"), ae = /'/g, le = /"/g, fe = /^(?:script|style|textarea|title)$/i, Re = (i) => (e, ...t) => ({ _$litType$: i, strings: e, values: t }), d = Re(1), A = Symbol.for("lit-noChange"), p = Symbol.for("lit-nothing"), ce = /* @__PURE__ */ new WeakMap(), $ = w.createTreeWalker(w, 129);
+\f\r"'\`<>=]|("|')|))|$)`, "g"), ae = /'/g, le = /"/g, fe = /^(?:script|style|textarea|title)$/i, Re = (i) => (e, ...t) => ({ _$litType$: i, strings: e, values: t }), d = Re(1), A = /* @__PURE__ */ Symbol.for("lit-noChange"), p = /* @__PURE__ */ Symbol.for("lit-nothing"), ce = /* @__PURE__ */ new WeakMap(), $ = w.createTreeWalker(w, 129);
 function _e(i, e) {
   if (!B(i) || !i.hasOwnProperty("raw")) throw Error("invalid template strings array");
   return ie !== void 0 ? ie.createHTML(e) : e;
@@ -487,11 +472,6 @@ const Le = (i, e, t) => {
   }
   return r._$AI(i), r;
 };
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 const K = globalThis;
 class x extends y {
   constructor() {
@@ -519,11 +499,6 @@ x._$litElement$ = !0, x.finalized = !0, K.litElementHydrateSupport?.({ LitElemen
 const qe = K.litElementPolyfillSupport;
 qe?.({ LitElement: x });
 (K.litElementVersions ??= []).push("4.2.2");
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 const je = { attribute: !0, type: String, converter: N, reflect: !1, hasChanged: F }, Ge = (i = je, e, t) => {
   const { kind: s, metadata: r } = t;
   let o = globalThis.litPropertyMetadata.get(r);
@@ -551,11 +526,6 @@ function J(i) {
     return r.constructor.createProperty(o, s), n ? Object.getOwnPropertyDescriptor(r, o) : void 0;
   })(i, e, t);
 }
-/**
- * @license
- * Copyright 2017 Google LLC
- * SPDX-License-Identifier: BSD-3-Clause
- */
 function Z(i) {
   return J({ ...i, state: !0, attribute: !1 });
 }
@@ -645,18 +615,34 @@ function Ke(i, e) {
 }
 function ge(i, e) {
   if (!i.states[e]) {
-    if (console.warn(`[ha-github-card] resolveGithubDevice — entity '${e}' not found in hass.states`), console.debug("[ha-github-card] resolveGithubDevice — available states count:", Object.keys(i.states).length), console.debug("[ha-github-card] resolveGithubDevice — hass.entities entry:", i.entities?.[e]), e.includes("/")) {
+    if (console.warn(
+      `[ha-github-card] resolveGithubDevice — entity '${e}' not found in hass.states`
+    ), console.debug(
+      "[ha-github-card] resolveGithubDevice — available states count:",
+      Object.keys(i.states).length
+    ), console.debug(
+      "[ha-github-card] resolveGithubDevice — hass.entities entry:",
+      i.entities?.[e]
+    ), e.includes("/")) {
       const [l, u] = e.split("/", 2), a = (v) => v.toLowerCase().replace(/[^a-z0-9]/g, "_"), f = a(l), _ = a(u), g = Object.keys(i.states).filter((v) => {
         const C = v.toLowerCase();
         return C.includes(f) && C.includes(_);
       });
-      if (console.debug(`[ha-github-card] resolveGithubDevice — fuzzy match for '${e}':`, g), g.length > 0)
-        return console.info(`[ha-github-card] resolveGithubDevice — remapped '${e}' → '${g[0]}'`), ge(i, g[0]);
+      if (console.debug(
+        `[ha-github-card] resolveGithubDevice — fuzzy match for '${e}':`,
+        g
+      ), g.length > 0)
+        return console.info(
+          `[ha-github-card] resolveGithubDevice — remapped '${e}' → '${g[0]}'`
+        ), ge(i, g[0]);
     }
     return null;
   }
   const t = i.states[e].attributes;
-  if (console.debug(`[ha-github-card] resolveGithubDevice — found '${e}' in hass.states, state='${i.states[e].state}', attrs:`, t), t.stargazers_count !== void 0 || t.full_name !== void 0)
+  if (console.debug(
+    `[ha-github-card] resolveGithubDevice — found '${e}' in hass.states, state='${i.states[e].state}', attrs:`,
+    t
+  ), t.stargazers_count !== void 0 || t.full_name !== void 0)
     return {
       entity_id: e,
       state: i.states[e].state,
@@ -665,10 +651,17 @@ function ge(i, e) {
       slot_icons: {}
     };
   const s = i.entities?.[e], r = s?.device_id ?? null;
-  console.debug("[ha-github-card] resolveGithubDevice — new-style path. regEntry:", s, "| deviceId:", r);
+  console.debug(
+    "[ha-github-card] resolveGithubDevice — new-style path. regEntry:",
+    s,
+    "| deviceId:",
+    r
+  );
   const o = r && i.entities ? Object.values(i.entities).filter((l) => l.device_id === r).map((l) => l.entity_id).filter((l) => l in i.states) : (() => {
     const l = Be(e);
-    if (console.debug(`[ha-github-card] resolveGithubDevice — no device registry, using prefix fallback: '${l}'`), l) {
+    if (console.debug(
+      `[ha-github-card] resolveGithubDevice — no device registry, using prefix fallback: '${l}'`
+    ), l) {
       const u = Object.keys(i.states).filter(
         (a) => a.toLowerCase().startsWith(l.toLowerCase())
       );
@@ -676,7 +669,10 @@ function ge(i, e) {
     }
     return [e];
   })();
-  console.debug("[ha-github-card] resolveGithubDevice — sibling entity IDs:", o);
+  console.debug(
+    "[ha-github-card] resolveGithubDevice — sibling entity IDs:",
+    o
+  );
   const n = {}, h = {};
   for (const l of o) {
     const u = i.states[l];
@@ -684,24 +680,38 @@ function ge(i, e) {
     const a = u.attributes, f = Ke(i, l);
     if (f && f in D) {
       const _ = D[f], g = parseFloat(u.state), v = isNaN(g) ? void 0 : g;
-      console.debug(`[ha-github-card]   ${l} → metricKey='${f}' → attr='${_}' state='${u.state}' value=${v}`), v !== void 0 && (n[_] = v);
+      console.debug(
+        `[ha-github-card]   ${l} → metricKey='${f}' → attr='${_}' state='${u.state}' value=${v}`
+      ), v !== void 0 && (n[_] = v);
       const C = We[f];
       C && a.icon && (h[C] = a.icon);
     } else
-      console.debug(`[ha-github-card]   ${l} → metricKey=${f ?? "null"} (no SENSOR_ATTR_MAP match) state='${u.state}' attrs:`, Object.keys(a));
+      console.debug(
+        `[ha-github-card]   ${l} → metricKey=${f ?? "null"} (no SENSOR_ATTR_MAP match) state='${u.state}' attrs:`,
+        Object.keys(a)
+      );
     if ((l.toLowerCase().includes("commit") || f === "latest_commit") && (a.sha && (n.latest_commit_sha = a.sha), a.url && (n.latest_commit_url = a.url), a.authored_at && (n.latest_commit_authored_at = a.authored_at), a.message && (n.latest_commit_message = a.message), !n.latest_commit_sha && u.state && u.state !== "unavailable" && (n.latest_commit_sha = u.state), a.icon && (h.last_commit = a.icon)), (l.toLowerCase().includes("release") || l.toLowerCase().includes("_tag") || f === "latest_tag") && (a.tag && (n.latest_release_tag = a.tag), !n.latest_release_tag && u.state && u.state !== "unavailable" && u.state !== "unknown" && (n.latest_release_tag = u.state)), a.html_url) {
       const _ = a.html_url;
       /\/(commit|releases|tree|blob|pull|issues)\//.test(_) || (n.html_url = _);
     }
     a.full_name && (n.full_name = a.full_name), a.language && (n.language = a.language), a.owner_avatar && (n.owner_avatar = a.owner_avatar), a.owner_login && (n.owner_login = a.owner_login);
   }
-  console.debug("[ha-github-card] resolveGithubDevice — combined attrs:", JSON.stringify(n)), console.debug("[ha-github-card] resolveGithubDevice — slot_icons:", h);
-  let c = e;
+  console.debug(
+    "[ha-github-card] resolveGithubDevice — combined attrs:",
+    JSON.stringify(n)
+  ), console.debug(
+    "[ha-github-card] resolveGithubDevice — slot_icons:",
+    h
+  );
+  let c;
   if (r && i.devices?.[r]) {
     const l = i.devices[r];
     c = l.name_by_user ?? l.name ?? e, !n.html_url && l.configuration_url && (n.html_url = l.configuration_url), !n.full_name && l.name && (n.full_name = l.name);
   } else
-    c = (t.friendly_name ?? e).replace(/\s+(Stargazers.*|Forks.*|Watchers.*|Issues.*|Pull Requests.*|Commits?.*|Releases?.*)$/i, "").trim() || e;
+    c = (t.friendly_name ?? e).replace(
+      /\s+(Stargazers.*|Forks.*|Watchers.*|Issues.*|Pull Requests.*|Commits?.*|Releases?.*)$/i,
+      ""
+    ).trim() || e;
   if (n.latest_release_tag && n.html_url) {
     const l = n.html_url.replace(/\/$/, "");
     n.latest_release_url = `${l}/releases/tag/${encodeURIComponent(n.latest_release_tag)}`;
@@ -763,18 +773,28 @@ const P = [
       show_header: !0,
       show_header_icon: !0,
       compact: !1,
-      rows: [["watchers", "stars", "last_commit"], ["pull_requests", "issues"]]
+      rows: [
+        ["watchers", "stars", "last_commit"],
+        ["pull_requests", "issues"]
+      ]
     };
   }
   setConfig(e) {
     if (!e.entities || !Array.isArray(e.entities))
       throw new Error('ha-github-card: "entities" must be an array');
-    const t = e.entities.filter((r) => typeof r == "string" && r.trim() !== "");
+    const t = e.entities.filter(
+      (r) => typeof r == "string" && r.trim() !== ""
+    );
     let s = e.rows;
     !s?.length && (e.row2_slots || e.row3_slots) && (s = [
       e.row2_slots ?? P[0],
       e.row3_slots ?? P[1]
-    ]), this._config = { ...ve.getStubConfig(), ...e, entities: t, rows: s ?? P };
+    ]), this._config = {
+      ...ve.getStubConfig(),
+      ...e,
+      entities: t,
+      rows: s ?? P
+    };
   }
   getCardSize() {
     return (this._config?.entities?.length ?? 1) * 3 + 1;
@@ -785,12 +805,25 @@ const P = [
   render() {
     if (!this._config || !this.hass) return p;
     const e = this._config.entities ?? [];
-    console.debug("[ha-github-card] card.render — configured entity IDs:", e), console.debug("[ha-github-card] card.render — hass.states keys (sample):", Object.keys(this.hass.states).slice(0, 20));
+    console.debug(
+      "[ha-github-card] card.render — configured entity IDs:",
+      e
+    ), console.debug(
+      "[ha-github-card] card.render — hass.states keys (sample):",
+      Object.keys(this.hass.states).slice(0, 20)
+    );
     const t = e.map((s) => {
       const r = ge(this.hass, s);
-      return console.debug(`[ha-github-card] card.render — resolveGithubDevice('${s}') =>`, r), r;
+      return console.debug(
+        `[ha-github-card] card.render — resolveGithubDevice('${s}') =>`,
+        r
+      ), r;
     }).filter((s) => s !== null);
-    return console.debug("[ha-github-card] card.render — resolved entities:", t.length, t.map((s) => s.entity_id)), d`
+    return console.debug(
+      "[ha-github-card] card.render — resolved entities:",
+      t.length,
+      t.map((s) => s.entity_id)
+    ), d`
       <ha-card>
         ${this._renderCardHeader()}
         <div class="card-content ${this._config.compact ? "compact" : ""}">
@@ -804,7 +837,9 @@ const P = [
     const e = this._config.title;
     return e ? d`
       <div class="card-header">
-        ${this._config.show_header_icon !== !1 ? d`<div class="header-icon"><ha-icon class="icon-header" .icon="${"mdi:github"}"></ha-icon></div>` : p}
+        ${this._config.show_header_icon !== !1 ? d`<div class="header-icon">
+              <ha-icon class="icon-header" .icon="${"mdi:github"}"></ha-icon>
+            </div>` : p}
         <span class="header-title">${e}</span>
       </div>
     ` : p;
@@ -819,17 +854,21 @@ const P = [
     const t = e.attributes, s = this._getRows();
     return d`
       <div class="entity-card">
-
         <!-- Row 1: name (fixed left) + version (fixed right) -->
         <div class="entity-header">
           <div class="header-name">
-            ${this._config.show_avatar && t.owner_avatar ? d`<img class="avatar" src="${t.owner_avatar}" alt="${t.owner_login}" />` : p}
+            ${this._config.show_avatar && t.owner_avatar ? d`<img
+                  class="avatar"
+                  src="${t.owner_avatar}"
+                  alt="${t.owner_login}"
+                />` : p}
             <a
               class="repo-name"
               href="${t.html_url ?? "#"}"
               target="_blank"
               rel="noopener noreferrer"
-            >${t.full_name ?? e.entity_id}</a>
+              >${t.full_name ?? e.entity_id}</a
+            >
           </div>
           <div class="header-version">
             ${t.latest_release_tag ? d`<a
@@ -837,22 +876,26 @@ const P = [
                   href="${t.latest_release_url ?? "#"}"
                   target="_blank"
                   rel="noopener noreferrer"
-                >${t.latest_release_tag}</a>` : d`<span class="version-none">no release</span>`}
+                  >${t.latest_release_tag}</a
+                >` : d`<span class="version-none">no release</span>`}
           </div>
         </div>
 
         <!-- Configurable rows -->
         ${s.map((r) => r.length > 0 ? d`
-            <div
-              class="entity-row"
-              style="grid-template-columns: repeat(${r.length}, 1fr)"
-            >
-              ${r.map((o) => d`
-                <div class="slot-cell">${this._renderSlot(o, e)}</div>
-              `)}
-            </div>
-          ` : p)}
-
+                <div
+                  class="entity-row"
+                  style="grid-template-columns: repeat(${r.length}, 1fr)"
+                >
+                  ${r.map(
+      (o) => d`
+                      <div class="slot-cell">
+                        ${this._renderSlot(o, e)}
+                      </div>
+                    `
+    )}
+                </div>
+              ` : p)}
       </div>
     `;
   }
@@ -890,7 +933,9 @@ const P = [
       case "pull_requests":
         return d`
           ${this._slotIcon(e, t)}
-          <span class="slot-value">${S(s.open_pull_requests_count)}</span>
+          <span class="slot-value"
+            >${S(s.open_pull_requests_count)}</span
+          >
           <span class="slot-label">Pull Requests</span>
         `;
       case "last_commit":
@@ -902,9 +947,14 @@ const P = [
                 target="_blank"
                 rel="noopener noreferrer"
                 title="${s.latest_commit_message}"
-              >${s.latest_commit_sha.slice(0, 7)}</a>
-              <span class="slot-label">${Je(s.latest_commit_authored_at)}</span>
-            ` : d`${this._slotIcon(e, t)}<span class="slot-value">—</span>`;
+                >${s.latest_commit_sha.slice(0, 7)}</a
+              >
+              <span class="slot-label"
+                >${Je(s.latest_commit_authored_at)}</span
+              >
+            ` : d`${this._slotIcon(e, t)}<span class="slot-value"
+                >—</span
+              >`;
       case "last_release":
         return d`
           ${this._slotIcon(e, t)}
@@ -913,7 +963,8 @@ const P = [
                 href="${s.latest_release_url ?? "#"}"
                 target="_blank"
                 rel="noopener noreferrer"
-              >${s.latest_release_tag}</a>` : d`<span class="slot-value">—</span>`}
+                >${s.latest_release_tag}</a
+              >` : d`<span class="slot-value">—</span>`}
         `;
       default:
         return d``;
@@ -924,12 +975,12 @@ const P = [
   // ------------------------------------------------------------------
   static styles = de`
     :host {
-      --gh-accent:    var(--primary-color, #0366d6);
-      --gh-text:      var(--primary-text-color, #24292e);
-      --gh-text-sec:  var(--secondary-text-color, #586069);
-      --gh-border:    var(--divider-color, #e1e4e8);
-      --gh-bg-row1:   var(--secondary-background-color, #f6f8fa);
-      --gh-link:      var(--primary-color, #0366d6);
+      --gh-accent: var(--primary-color, #0366d6);
+      --gh-text: var(--primary-text-color, #24292e);
+      --gh-text-sec: var(--secondary-text-color, #586069);
+      --gh-border: var(--divider-color, #e1e4e8);
+      --gh-bg-row1: var(--secondary-background-color, #f6f8fa);
+      --gh-link: var(--primary-color, #0366d6);
     }
 
     ha-card {
@@ -957,7 +1008,9 @@ const P = [
       flex-shrink: 0;
     }
 
-    .header-title { flex: 1; }
+    .header-title {
+      flex: 1;
+    }
 
     /* ---- Content wrapper ---- */
     .card-content {
@@ -967,7 +1020,9 @@ const P = [
       gap: 10px;
     }
 
-    .card-content.compact { gap: 6px; }
+    .card-content.compact {
+      gap: 6px;
+    }
 
     .empty {
       color: var(--gh-text-sec);
@@ -1020,9 +1075,13 @@ const P = [
       white-space: nowrap;
     }
 
-    .repo-name:hover { text-decoration: underline; }
+    .repo-name:hover {
+      text-decoration: underline;
+    }
 
-    .header-version { flex-shrink: 0; }
+    .header-version {
+      flex-shrink: 0;
+    }
 
     .version-link {
       font-size: 0.78rem;
@@ -1034,7 +1093,9 @@ const P = [
       padding: 2px 9px;
     }
 
-    .version-link:hover { text-decoration: underline; }
+    .version-link:hover {
+      text-decoration: underline;
+    }
 
     .version-none {
       font-size: 0.78rem;
@@ -1044,7 +1105,7 @@ const P = [
 
     /* ---- Rows 2 & 3: configurable grid ---- */
     .entity-row {
-      display: grid;   /* columns set inline via style="" */
+      display: grid; /* columns set inline via style="" */
     }
 
     /* ---- Slot cell ---- */
@@ -1059,7 +1120,9 @@ const P = [
       overflow: hidden;
     }
 
-    .compact .slot-cell { padding: 6px 10px; }
+    .compact .slot-cell {
+      padding: 6px 10px;
+    }
 
     .slot-cell + .slot-cell {
       /* no border between cells */
@@ -1089,7 +1152,9 @@ const P = [
       white-space: nowrap;
     }
 
-    .slot-link:hover { text-decoration: underline; }
+    .slot-link:hover {
+      text-decoration: underline;
+    }
 
     /* Monospace commit hash */
     .slot-mono-link {
@@ -1102,7 +1167,9 @@ const P = [
       flex-shrink: 0;
     }
 
-    .slot-mono-link:hover { text-decoration: underline; }
+    .slot-mono-link:hover {
+      text-decoration: underline;
+    }
 
     .slot-lang {
       font-weight: 600;
@@ -1179,13 +1246,19 @@ class j extends x {
       return;
     }
     const s = this._config.entities ?? [];
-    s.includes(t) || this._fireConfigChanged({ ...this._config, entities: [...s, t] }), this._pickerValue = "";
+    s.includes(t) || this._fireConfigChanged({
+      ...this._config,
+      entities: [...s, t]
+    }), this._pickerValue = "";
   }
   _addCurrentEntity() {
     const e = this._pickerValue.trim();
     if (console.debug("[ha-github-card] editor._addCurrentEntity —", e), !e) return;
     const t = this._config.entities ?? [];
-    t.includes(e) || this._fireConfigChanged({ ...this._config, entities: [...t, e] }), this._pickerValue = "";
+    t.includes(e) || this._fireConfigChanged({
+      ...this._config,
+      entities: [...t, e]
+    }), this._pickerValue = "";
   }
   _setValue(e, t) {
     this._fireConfigChanged({ ...this._config, [e]: t });
@@ -1195,7 +1268,8 @@ class j extends x {
     t.trim() ? s[e] = t.trim() : delete s[e], this._fireConfigChanged({ ...this._config, icons: s });
   }
   _getRows() {
-    if (this._config.rows?.length) return this._config.rows.map((s) => [...s]);
+    if (this._config.rows?.length)
+      return this._config.rows.map((s) => [...s]);
     const e = this._config.row2_slots ?? ["watchers", "stars", "last_commit"], t = this._config.row3_slots ?? ["pull_requests", "issues"];
     return [[...e], [...t]];
   }
@@ -1210,11 +1284,17 @@ class j extends x {
   }
   _addRow() {
     const e = this._getRows();
-    e.length >= 5 || this._fireConfigChanged({ ...this._config, rows: [...e, ["none"]] });
+    e.length >= 5 || this._fireConfigChanged({
+      ...this._config,
+      rows: [...e, ["none"]]
+    });
   }
   _removeRow(e) {
     const t = this._getRows();
-    this._fireConfigChanged({ ...this._config, rows: t.filter((s, r) => r !== e) });
+    this._fireConfigChanged({
+      ...this._config,
+      rows: t.filter((s, r) => r !== e)
+    });
   }
   _fireConfigChanged(e) {
     this._config = e, this.dispatchEvent(
@@ -1229,10 +1309,26 @@ class j extends x {
   // Render
   // ------------------------------------------------------------------
   render() {
-    if (console.debug("[ha-github-card] editor.render — hass:", !!this.hass, "| _config:", this._config), !this._config)
-      return console.warn("[ha-github-card] editor.render — _config is not set yet, rendering nothing"), p;
+    if (console.debug(
+      "[ha-github-card] editor.render — hass:",
+      !!this.hass,
+      "| _config:",
+      this._config
+    ), !this._config)
+      return console.warn(
+        "[ha-github-card] editor.render — _config is not set yet, rendering nothing"
+      ), p;
     const e = this._config, t = e.entities ?? [], s = this._getRows(), r = this.hass ? Ve(this.hass) : [];
-    return console.debug("[ha-github-card] editor.render — githubEntities found:", r.length, r), console.debug("[ha-github-card] editor — ha-textfield defined:", !!customElements.get("ha-textfield"), "| ha-entity-picker defined:", !!customElements.get("ha-entity-picker")), d`
+    return console.debug(
+      "[ha-github-card] editor.render — githubEntities found:",
+      r.length,
+      r
+    ), console.debug(
+      "[ha-github-card] editor — ha-textfield defined:",
+      !!customElements.get("ha-textfield"),
+      "| ha-entity-picker defined:",
+      !!customElements.get("ha-entity-picker")
+    ), d`
       <div class="field-group">
         <label class="field-label" for="card-title">Card Title</label>
         <input
@@ -1254,12 +1350,18 @@ class j extends x {
       return d`
                   <div class="entity-row ${n ? "" : "entity-warn"}">
                     <span class="entity-id">${o}</span>
-                    ${n ? p : d`<span class="warn-icon" title="Entity not found in HA — check ID">⚠</span>`}
+                    ${n ? p : d`<span
+                          class="warn-icon"
+                          title="Entity not found in HA — check ID"
+                          >⚠</span
+                        >`}
                     <button
                       class="remove-btn"
                       @click="${() => this._removeEntity(o)}"
                       aria-label="Remove"
-                    >✕</button>
+                    >
+                      ✕
+                    </button>
                   </div>
                 `;
     })}
@@ -1284,47 +1386,68 @@ class j extends x {
         <button class="add-btn" @click="${this._addCurrentEntity}">Add</button>
       </div>
       <p class="hint">
-        ${r.length > 0 ? d`${r.length} GitHub entities available — pick from list or type any entity ID.` : d`No GitHub entities auto-detected. Type the entity ID manually (e.g. <em>sensor.owner_repo_watchers_count</em>).`}
+        ${r.length > 0 ? d`${r.length} GitHub entities available — pick from
+            list or type any entity ID.` : d`No GitHub entities auto-detected. Type the entity ID manually
+              (e.g. <em>sensor.owner_repo_watchers_count</em>).`}
       </p>
 
       <div class="section-label">Rows — ${s.length} / 5</div>
 
-      ${s.map((o, n) => d`
-        <div class="row-block">
-          <div class="row-block-header">
-            <span class="row-block-title">Row ${n + 1}</span>
-            <div class="col-count-btns">
-              <span class="col-count-label">Cols:</span>
-              ${[1, 2, 3].map((h) => d`
-                <button
-                  class="col-count-btn ${o.length === h ? "active" : ""}"
-                  @click="${() => this._setRowColCount(n, h)}"
-                >${h}</button>
-              `)}
+      ${s.map(
+      (o, n) => d`
+          <div class="row-block">
+            <div class="row-block-header">
+              <span class="row-block-title">Row ${n + 1}</span>
+              <div class="col-count-btns">
+                <span class="col-count-label">Cols:</span>
+                ${[1, 2, 3].map(
+        (h) => d`
+                    <button
+                      class="col-count-btn ${o.length === h ? "active" : ""}"
+                      @click="${() => this._setRowColCount(n, h)}"
+                    >
+                      ${h}
+                    </button>
+                  `
+      )}
+              </div>
+              <button
+                class="remove-btn row-remove-btn"
+                @click="${() => this._removeRow(n)}"
+                aria-label="Remove row"
+                ?disabled="${s.length <= 1}"
+              >
+                ✕
+              </button>
             </div>
-            <button
-              class="remove-btn row-remove-btn"
-              @click="${() => this._removeRow(n)}"
-              aria-label="Remove row"
-              ?disabled="${s.length <= 1}"
-            >✕</button>
+            <div class="slot-row">
+              ${o.map(
+        (h, c) => this._renderSlotSelect(
+          n,
+          c,
+          h,
+          `Col ${c + 1}`
+        )
+      )}
+            </div>
           </div>
-          <div class="slot-row">
-            ${o.map((h, c) => this._renderSlotSelect(n, c, h, `Col ${c + 1}`))}
-          </div>
-        </div>
-      `)}
-
+        `
+    )}
       ${s.length < 5 ? d`
-        <button class="add-row-btn" @click="${() => this._addRow()}">+ Add Row</button>
-      ` : p}
+            <button class="add-row-btn" @click="${() => this._addRow()}">
+              + Add Row
+            </button>
+          ` : p}
 
       <div class="section-label">Visual Options</div>
       <label class="toggle-row">
         <input
           type="checkbox"
           .checked="${e.show_header !== !1}"
-          @change="${(o) => this._setValue("show_header", o.target.checked)}"
+          @change="${(o) => this._setValue(
+      "show_header",
+      o.target.checked
+    )}"
         />
         Show Card Header (title bar)
       </label>
@@ -1332,7 +1455,10 @@ class j extends x {
         <input
           type="checkbox"
           .checked="${e.show_header_icon !== !1}"
-          @change="${(o) => this._setValue("show_header_icon", o.target.checked)}"
+          @change="${(o) => this._setValue(
+      "show_header_icon",
+      o.target.checked
+    )}"
         />
         Show GitHub Icon in Header
       </label>
@@ -1340,7 +1466,10 @@ class j extends x {
         <input
           type="checkbox"
           .checked="${e.show_avatar !== !1}"
-          @change="${(o) => this._setValue("show_avatar", o.target.checked)}"
+          @change="${(o) => this._setValue(
+      "show_avatar",
+      o.target.checked
+    )}"
         />
         Show Owner Avatar
       </label>
@@ -1360,27 +1489,41 @@ class j extends x {
       <div class="slot-select-wrap">
         <span class="slot-col-label">${r}</span>
         <select
-          @change="${(n) => this._setRowSlot(e, t, n.target.value)}"
+          @change="${(n) => this._setRowSlot(
+      e,
+      t,
+      n.target.value
+    )}"
         >
           ${et.map(
       ([n, h]) => d`
-              <option value="${n}" ?selected="${n === s}">${h}</option>
+              <option value="${n}" ?selected="${n === s}">
+                ${h}
+              </option>
             `
     )}
         </select>
         ${s !== "none" ? d`
-          <div class="icon-override-row">
-            ${o ? d`<ha-icon class="icon-preview" .icon="${o}"></ha-icon>` : d`<span class="icon-preview-placeholder">&#xFFFD;</span>`}
-            <input
-              type="text"
-              class="text-input icon-input"
-              placeholder="mdi:star"
-              .value="${o}"
-              title="Override icon (leave empty to use sensor default)"
-              @change="${(n) => this._setSlotIcon(s, n.target.value)}"
-            />
-          </div>
-        ` : p}
+              <div class="icon-override-row">
+                ${o ? d`<ha-icon
+                      class="icon-preview"
+                      .icon="${o}"
+                    ></ha-icon>` : d`<span class="icon-preview-placeholder"
+                      >&#xFFFD;</span
+                    >`}
+                <input
+                  type="text"
+                  class="text-input icon-input"
+                  placeholder="mdi:star"
+                  .value="${o}"
+                  title="Override icon (leave empty to use sensor default)"
+                  @change="${(n) => this._setSlotIcon(
+      s,
+      n.target.value
+    )}"
+                />
+              </div>
+            ` : p}
       </div>
     `;
   }
@@ -1408,7 +1551,11 @@ class j extends x {
       margin: 0;
       line-height: 1.5;
     }
-    .field-group { display: flex; flex-direction: column; gap: 4px; }
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
     .field-label {
       font-size: 0.75rem;
       font-weight: 600;
@@ -1430,9 +1577,14 @@ class j extends x {
     .text-input:focus {
       outline: none;
       border-color: var(--primary-color, #0366d6);
-      box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary-color, #0366d6) 20%, transparent);
+      box-shadow: 0 0 0 2px
+        color-mix(in srgb, var(--primary-color, #0366d6) 20%, transparent);
     }
-    .entity-list { display: flex; flex-direction: column; gap: 4px; }
+    .entity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
     .entity-row {
       display: flex;
       align-items: center;
@@ -1440,14 +1592,32 @@ class j extends x {
       padding: 6px 8px 6px 12px;
       border: 1px solid var(--primary-color, #0366d6);
       border-radius: 6px;
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 6%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 6%,
+        transparent
+      );
     }
     .entity-row.entity-warn {
       border-color: var(--warning-color, #f59e0b);
-      background: color-mix(in srgb, var(--warning-color, #f59e0b) 8%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--warning-color, #f59e0b) 8%,
+        transparent
+      );
     }
-    .entity-id { flex: 1; font-size: 0.85rem; color: var(--primary-text-color); word-break: break-all; }
-    .warn-icon { color: var(--warning-color, #f59e0b); font-size: 1rem; cursor: help; flex-shrink: 0; }
+    .entity-id {
+      flex: 1;
+      font-size: 0.85rem;
+      color: var(--primary-text-color);
+      word-break: break-all;
+    }
+    .warn-icon {
+      color: var(--warning-color, #f59e0b);
+      font-size: 1rem;
+      cursor: help;
+      flex-shrink: 0;
+    }
     .remove-btn {
       flex-shrink: 0;
       background: none;
@@ -1459,9 +1629,23 @@ class j extends x {
       border-radius: 4px;
       line-height: 1;
     }
-    .remove-btn:hover { background: color-mix(in srgb, var(--error-color, #f44336) 12%, transparent); color: var(--error-color, #f44336); }
-    .add-entity-row { display: flex; gap: 8px; align-items: center; }
-    .entity-input { flex: 1; margin-bottom: 0; }
+    .remove-btn:hover {
+      background: color-mix(
+        in srgb,
+        var(--error-color, #f44336) 12%,
+        transparent
+      );
+      color: var(--error-color, #f44336);
+    }
+    .add-entity-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .entity-input {
+      flex: 1;
+      margin-bottom: 0;
+    }
     .add-btn {
       flex-shrink: 0;
       padding: 8px 16px;
@@ -1475,9 +1659,20 @@ class j extends x {
       white-space: nowrap;
       font-family: inherit;
     }
-    .add-btn:hover { opacity: 0.88; }
-    .slot-row { display: flex; gap: 8px; }
-    .slot-select-wrap { flex: 1; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+    .add-btn:hover {
+      opacity: 0.88;
+    }
+    .slot-row {
+      display: flex;
+      gap: 8px;
+    }
+    .slot-select-wrap {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
     .slot-col-label {
       font-size: 0.72rem;
       font-weight: 700;
@@ -1496,7 +1691,10 @@ class j extends x {
       cursor: pointer;
       font-family: inherit;
     }
-    select:focus { outline: none; border-color: var(--primary-color, #0366d6); }
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color, #0366d6);
+    }
     .icon-override-row {
       display: flex;
       align-items: center;
@@ -1521,7 +1719,10 @@ class j extends x {
       color: var(--secondary-text-color);
       opacity: 0.4;
     }
-    .icon-input { font-size: 0.75rem; padding: 4px 6px; }
+    .icon-input {
+      font-size: 0.75rem;
+      padding: 4px 6px;
+    }
     .toggle-row {
       display: flex;
       align-items: center;
@@ -1543,7 +1744,11 @@ class j extends x {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      background: color-mix(in srgb, var(--primary-text-color, #000) 2%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-text-color, #000) 2%,
+        transparent
+      );
     }
     .row-block-header {
       display: flex;
@@ -1581,27 +1786,48 @@ class j extends x {
       font-family: inherit;
       padding: 0;
     }
-    .col-count-btn:hover { background: color-mix(in srgb, var(--primary-color, #0366d6) 10%, transparent); }
+    .col-count-btn:hover {
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 10%,
+        transparent
+      );
+    }
     .col-count-btn.active {
       background: var(--primary-color, #0366d6);
       color: var(--text-primary-color, #fff);
       border-color: var(--primary-color, #0366d6);
     }
-    .row-remove-btn { padding: 2px 6px; }
-    .row-remove-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+    .row-remove-btn {
+      padding: 2px 6px;
+    }
+    .row-remove-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
     .add-row-btn {
       align-self: flex-start;
       padding: 7px 14px;
       border: 1px dashed var(--primary-color, #0366d6);
       border-radius: 6px;
-      background: color-mix(in srgb, var(--primary-color, #0366d6) 6%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 6%,
+        transparent
+      );
       color: var(--primary-color, #0366d6);
       font-size: 0.85rem;
       font-weight: 600;
       cursor: pointer;
       font-family: inherit;
     }
-    .add-row-btn:hover { background: color-mix(in srgb, var(--primary-color, #0366d6) 14%, transparent); }
+    .add-row-btn:hover {
+      background: color-mix(
+        in srgb,
+        var(--primary-color, #0366d6) 14%,
+        transparent
+      );
+    }
   `;
 }
 Q([
