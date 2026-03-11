@@ -1,0 +1,9 @@
+name: "CodeQL config"
+
+paths:
+  - src
+
+paths-ignore:
+  - ha-github-card.js
+  - node_modules
+  - "**/*.min.js"

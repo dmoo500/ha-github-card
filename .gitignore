@@ -1,0 +1,5 @@
+.DS_Store
+node_modules/
+dist/
+ha-github-card.js.map
+*.log

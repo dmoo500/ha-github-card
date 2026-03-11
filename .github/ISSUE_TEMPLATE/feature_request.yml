@@ -1,0 +1,62 @@
+name: Feature Request
+description: Suggest a new feature for the project
+title: "[FEATURE] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your feature suggestion!
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem/Motivation
+      description: What problem does your feature solve?
+      placeholder: As a user, I want to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Desired Solution
+      description: Describe the desired functionality
+      placeholder: The card should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: Have you considered alternative solutions?
+      placeholder: Alternatively, one could...
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature to you?
+      options:
+        - Low (nice to have)
+        - Medium (would help)
+        - High (very important)
+        - Critical (blocking)
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Screenshots, mockups, or further information
+      placeholder: Attachments, links, or further details...
+
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have searched for similar feature requests
+          required: true
+        - label: This feature fits the scope of the GitHub Card
+          required: true
