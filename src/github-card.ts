@@ -215,6 +215,12 @@ export class GithubCard extends LitElement {
 
   private _matchSlotRule(key: SlotKey, entity: GithubEntityData) {
     const rules = this._config.slot_colors?.[key];
+    console.debug(
+      `[ha-github-card] _matchSlotRule key=${key} slot_colors=`,
+      JSON.stringify(this._config.slot_colors),
+      `rules=`,
+      JSON.stringify(rules),
+    );
     if (!rules?.length) return null;
     const a = entity.attributes;
     const numericValue: Record<string, number | undefined> = {
@@ -225,18 +231,26 @@ export class GithubCard extends LitElement {
       pull_requests: a.open_pull_requests_count,
     };
     const val = numericValue[key];
+    console.debug(
+      `[ha-github-card] _matchSlotRule key=${key} val=${val} rules=`,
+      JSON.stringify(rules),
+    );
     if (val === undefined) return null;
     for (const rule of rules) {
+      const ruleValue = Number(rule.value);
       const match =
         rule.op === ">"
-          ? val > rule.value
+          ? val > ruleValue
           : rule.op === ">="
-            ? val >= rule.value
+            ? val >= ruleValue
             : rule.op === "<"
-              ? val < rule.value
+              ? val < ruleValue
               : rule.op === "<="
-                ? val <= rule.value
-                : val === rule.value;
+                ? val <= ruleValue
+                : val === ruleValue;
+      console.debug(
+        `[ha-github-card]   rule: ${val} ${rule.op} ${ruleValue} → ${match} (type=${rule.type} color=${rule.color})`,
+      );
       if (match) return rule;
     }
     return null;
