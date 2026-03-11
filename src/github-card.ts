@@ -196,16 +196,15 @@ export class GithubCard extends LitElement {
                   class="entity-row"
                   style="grid-template-columns: repeat(${row.length}, 1fr)"
                 >
-                  ${row.map(
-                    (s) => html`
-                      <div
-                        class="slot-cell"
-                        style="${this._slotColor(s, entity)}"
-                      >
-                        ${this._renderSlot(s, entity)}
+                  ${row.map((s) => {
+                    const bg = this._slotBgStyle(s, entity);
+                    const tc = this._slotTextColor(s, entity);
+                    return html`
+                      <div class="slot-cell" style="${bg}">
+                        ${this._renderSlot(s, entity, tc)}
                       </div>
-                    `,
-                  )}
+                    `;
+                  })}
                 </div>
               `
             : nothing;
@@ -214,9 +213,9 @@ export class GithubCard extends LitElement {
     `;
   }
 
-  private _slotColor(key: SlotKey, entity: GithubEntityData): string {
+  private _matchSlotRule(key: SlotKey, entity: GithubEntityData) {
     const rules = this._config.slot_colors?.[key];
-    if (!rules?.length) return "";
+    if (!rules?.length) return null;
     const a = entity.attributes;
     const numericValue: Record<string, number | undefined> = {
       stars: a.stargazers_count,
@@ -226,7 +225,7 @@ export class GithubCard extends LitElement {
       pull_requests: a.open_pull_requests_count,
     };
     const val = numericValue[key];
-    if (val === undefined) return "";
+    if (val === undefined) return null;
     for (const rule of rules) {
       const match =
         rule.op === ">"
@@ -238,12 +237,22 @@ export class GithubCard extends LitElement {
               : rule.op === "<="
                 ? val <= rule.value
                 : val === rule.value;
-      if (match)
-        return rule.type === "background"
-          ? `background-color: ${rule.color}; border-radius: 4px; padding: 0 4px;`
-          : `--slot-color-override: ${rule.color};`;
+      if (match) return rule;
     }
+    return null;
+  }
+
+  private _slotBgStyle(key: SlotKey, entity: GithubEntityData): string {
+    const rule = this._matchSlotRule(key, entity);
+    if (rule?.type === "background")
+      return `background-color: ${rule.color}; border-radius: 4px; padding: 0 4px;`;
     return "";
+  }
+
+  private _slotTextColor(key: SlotKey, entity: GithubEntityData): string {
+    const rule = this._matchSlotRule(key, entity);
+    if (!rule || rule.type === "background") return "";
+    return rule.color;
   }
 
   private _slotIcon(key: SlotKey, entity: GithubEntityData) {
@@ -257,40 +266,49 @@ export class GithubCard extends LitElement {
     return html`<ha-icon class="icon-sm" .icon="${icon}"></ha-icon>`;
   }
 
-  private _renderSlot(key: SlotKey, entity: GithubEntityData) {
+  private _renderSlot(key: SlotKey, entity: GithubEntityData, textColor = "") {
     const a = entity.attributes;
+    const cs = textColor ? `color: ${textColor};` : "";
     switch (key) {
       case "stars":
         return html`
           ${this._slotIcon(key, entity)}
-          <span class="slot-value">${formatCount(a.stargazers_count)}</span>
-          <span class="slot-label">Stars</span>
+          <span class="slot-value" style="${cs}"
+            >${formatCount(a.stargazers_count)}</span
+          >
+          <span class="slot-label" style="${cs}">Stars</span>
         `;
       case "forks":
         return html`
           ${this._slotIcon(key, entity)}
-          <span class="slot-value">${formatCount(a.forks_count)}</span>
-          <span class="slot-label">Forks</span>
+          <span class="slot-value" style="${cs}"
+            >${formatCount(a.forks_count)}</span
+          >
+          <span class="slot-label" style="${cs}">Forks</span>
         `;
       case "watchers":
         return html`
           ${this._slotIcon(key, entity)}
-          <span class="slot-value">${formatCount(a.watchers_count)}</span>
-          <span class="slot-label">Watchers</span>
+          <span class="slot-value" style="${cs}"
+            >${formatCount(a.watchers_count)}</span
+          >
+          <span class="slot-label" style="${cs}">Watchers</span>
         `;
       case "issues":
         return html`
           ${this._slotIcon(key, entity)}
-          <span class="slot-value">${formatCount(a.open_issues_count)}</span>
-          <span class="slot-label">Issues</span>
+          <span class="slot-value" style="${cs}"
+            >${formatCount(a.open_issues_count)}</span
+          >
+          <span class="slot-label" style="${cs}">Issues</span>
         `;
       case "pull_requests":
         return html`
           ${this._slotIcon(key, entity)}
-          <span class="slot-value"
+          <span class="slot-value" style="${cs}"
             >${formatCount(a.open_pull_requests_count)}</span
           >
-          <span class="slot-label">Pull Requests</span>
+          <span class="slot-label" style="${cs}">Pull Requests</span>
         `;
       case "last_commit":
         return a.latest_commit_sha
@@ -490,13 +508,13 @@ export class GithubCard extends LitElement {
 
     .slot-value {
       font-weight: 700;
-      color: var(--slot-color-override, var(--gh-text));
+      color: var(--gh-text);
       flex-shrink: 0;
     }
 
     .slot-label {
       font-size: 0.72rem;
-      color: var(--slot-color-override, var(--gh-text-sec));
+      color: var(--gh-text-sec);
       opacity: 0.8;
       overflow: hidden;
       text-overflow: ellipsis;
