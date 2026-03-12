@@ -164,7 +164,10 @@ export class GithubCard extends LitElement {
               ? html`<img
                   class="avatar"
                   src="${a.owner_avatar}"
-                  alt="${a.owner_login}"
+                  alt="${a.owner_login ?? ""}"
+                  @error="${(e: Event) => {
+                    (e.target as any).style.display = "none";
+                  }}"
                 />`
               : nothing}
             <a

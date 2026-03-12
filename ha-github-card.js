@@ -699,10 +699,6 @@ function ge(i, e) {
       !n.owner_avatar && _.avatar_url && (n.owner_avatar = _.avatar_url), !n.owner_login && _.login && (n.owner_login = _.login);
     }
   }
-  if (!n.owner_avatar && n.full_name) {
-    const l = n.full_name.split("/")[0];
-    l && (n.owner_login = n.owner_login ?? l, n.owner_avatar = `https://avatars.githubusercontent.com/${l}?s=60`);
-  }
   console.debug(
     "[ha-github-card] resolveGithubDevice — combined attrs:",
     JSON.stringify(n)
@@ -719,6 +715,10 @@ function ge(i, e) {
       /\s+(Stargazers.*|Forks.*|Watchers.*|Issues.*|Pull Requests.*|Commits?.*|Releases?.*)$/i,
       ""
     ).trim() || e;
+  if (!n.owner_avatar && n.full_name) {
+    const l = n.full_name.split("/")[0];
+    l && (n.owner_login = n.owner_login ?? l, n.owner_avatar = `https://avatars.githubusercontent.com/${l}?s=60`);
+  }
   if (n.latest_release_tag && n.html_url) {
     const l = n.html_url.replace(/\/$/, "");
     n.latest_release_url = `${l}/releases/tag/${encodeURIComponent(n.latest_release_tag)}`;
@@ -867,7 +867,10 @@ const R = [
             ${this._config.show_avatar && t.owner_avatar ? u`<img
                   class="avatar"
                   src="${t.owner_avatar}"
-                  alt="${t.owner_login}"
+                  alt="${t.owner_login ?? ""}"
+                  @error="${(r) => {
+      r.target.style.display = "none";
+    }}"
                 />` : p}
             <a
               class="repo-name"

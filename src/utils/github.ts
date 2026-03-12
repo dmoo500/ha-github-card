@@ -324,15 +324,6 @@ export function resolveGithubDevice(
     }
   }
 
-  // Fallback: derive avatar URL from full_name (e.g. "owner/repo" → GitHub avatar CDN)
-  if (!combined.owner_avatar && combined.full_name) {
-    const ownerPart = combined.full_name.split("/")[0];
-    if (ownerPart) {
-      combined.owner_login = combined.owner_login ?? ownerPart;
-      combined.owner_avatar = `https://avatars.githubusercontent.com/${ownerPart}?s=60`;
-    }
-  }
-
   console.debug(
     "[ha-github-card] resolveGithubDevice — combined attrs:",
     JSON.stringify(combined),
@@ -363,6 +354,15 @@ export function resolveGithubDevice(
           "",
         )
         .trim() || entityId;
+  }
+
+  // Fallback: derive avatar URL from full_name — done after device registry so full_name is populated.
+  if (!combined.owner_avatar && combined.full_name) {
+    const ownerPart = combined.full_name.split("/")[0];
+    if (ownerPart) {
+      combined.owner_login = combined.owner_login ?? ownerPart;
+      combined.owner_avatar = `https://avatars.githubusercontent.com/${ownerPart}?s=60`;
+    }
   }
 
   // Construct release URL from repo base + tag — done after device registry so html_url is populated.
