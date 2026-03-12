@@ -240,10 +240,14 @@ export class GithubCardEditor extends LitElement {
             <div class="entity-list">
               ${selectedEntities.map((entityId) => {
                 const inStates = !!(this.hass && this.hass.states[entityId]);
+                const inRegistry = !!(
+                  this.hass && this.hass.entities?.[entityId]
+                );
+                const known = inStates || inRegistry;
                 return html`
-                  <div class="entity-row ${inStates ? "" : "entity-warn"}">
+                  <div class="entity-row ${known ? "" : "entity-warn"}">
                     <span class="entity-id">${entityId}</span>
-                    ${!inStates
+                    ${!known
                       ? html`<span
                           class="warn-icon"
                           title="Entity not found in HA — check ID"
