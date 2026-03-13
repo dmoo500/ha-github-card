@@ -243,7 +243,23 @@ export class GithubCardEditor extends LitElement {
                 const inRegistry = !!(
                   this.hass && this.hass.entities?.[entityId]
                 );
-                const known = inStates || inRegistry;
+                const fuzzyMatch =
+                  !inStates &&
+                  !inRegistry &&
+                  entityId.includes("/") &&
+                  !!this.hass &&
+                  (() => {
+                    const [owner, repo] = entityId.split("/", 2);
+                    const sanitize = (s: string) =>
+                      s.toLowerCase().replace(/[^a-z0-9]/g, "_");
+                    const op = sanitize(owner);
+                    const rp = sanitize(repo);
+                    return Object.keys(this.hass!.states).some((id) => {
+                      const lower = id.toLowerCase();
+                      return lower.includes(op) && lower.includes(rp);
+                    });
+                  })();
+                const known = inStates || inRegistry || fuzzyMatch;
                 return html`
                   <div class="entity-row ${known ? "" : "entity-warn"}">
                     <span class="entity-id">${entityId}</span>
