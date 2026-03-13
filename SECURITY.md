@@ -18,7 +18,13 @@ Include:
 - Steps to reproduce
 - Potential impact
 
-You will receive a response within **some days**. If confirmed, a fix will be released as soon as possible and credited to you (unless you prefer anonymity).
+## Response Timeline
+
+This is a single-maintainer open-source project. I will do my best to:
+
+- **Acknowledge** your report within **7 days**
+- **Assess and respond** with a plan within **14 days**
+- **Release a fix** within **30 days** where technically feasible
 
 ## Scope
 
