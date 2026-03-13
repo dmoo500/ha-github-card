@@ -1,5 +1,5 @@
 import { LitElement, html, css, nothing } from "lit";
-import { property, state } from "lit/decorators.js";
+import { state } from "lit/decorators.js";
 import type {
   HomeAssistant,
   GithubCardConfig,
@@ -28,7 +28,17 @@ const SLOT_FALLBACK_ICONS: Record<string, string> = {
 };
 
 export class GithubCard extends LitElement {
-  @property({ attribute: false }) public hass!: HomeAssistant;
+  private _hass!: HomeAssistant;
+
+  public get hass(): HomeAssistant {
+    return this._hass;
+  }
+
+  public set hass(hass: HomeAssistant) {
+    this._hass = hass;
+    this.requestUpdate();
+  }
+
   @state() private _config!: GithubCardConfig;
 
   // ------------------------------------------------------------------

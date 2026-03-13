@@ -84,5 +84,6 @@ jobs:
           --title "GitHub Card ${{ steps.version.outputs.VERSION }}" \
           --notes "$NOTES" \
           --prerelease \
+          --overwrite \
           "./ha-github-card-${{ steps.version.outputs.VERSION }}.zip" \
           "./release/ha-github-card.js"
