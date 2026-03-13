@@ -63,27 +63,53 @@ jobs:
           echo "CHANGELOG=Release ${{ steps.version.outputs.VERSION }}" >> $GITHUB_OUTPUT
         fi
 
-    - name: Create GitHub Release and upload assets
+    - name: Create GitHub Release
+      uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        NOTES="## GitHub Card ${{ steps.version.outputs.VERSION }}
+      with:
+        tag_name: v${{ steps.version.outputs.VERSION }}
+        release_name: SwissWeather Card v${{ steps.version.outputs.VERSION }}
+        boddy: |
+          ## GitHub Card ${{ steps.version.outputs.VERSION }}
 
-        ### Installation
+          ### 📦 Installation
+          
+          #### HACS (Recommended)
+          1. Add this repository to HACS
+          2. Search for "SwissWeather Card"
+          3. Install the latest version
 
-        **HACS:** Add this repository, search for \"GitHub Card\", install.
+          #### Manual
+          1. Download `swissweather-card.js`
+          2. Copy it to `config/www/`
+          3. Add the resource to Lovelace
 
-        **Manual:** Download \`ha-github-card.js\`, copy to \`config/www/ha-github-card/\`, add resource \`/local/ha-github-card/ha-github-card.js\`.
+          ### Compatibility
+          - Home Assistant 2025.8+
+          - Requires the [GitHub integration](https://www.home-assistant.io/integrations/github/)
 
-        ### Compatibility
-        - Home Assistant 2024.1+
-        - Requires the [GitHub integration](https://www.home-assistant.io/integrations/github/)
-        "
-
-        gh release create "${{ github.ref_name }}" \
-          --title "GitHub Card ${{ steps.version.outputs.VERSION }}" \
-          --notes "$NOTES" \
-          --prerelease \
-          --overwrite \
-          "./ha-github-card-${{ steps.version.outputs.VERSION }}.zip" \
-          "./release/ha-github-card.js"
+        draft: false
+        prerelease: false
+    
+    - name: Upload release asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./swissweather-card-${{ steps.version.outputs.VERSION }}.zip
+        asset_name: swissweather-card-${{ steps.version.outputs.VERSION }}.zip
+        asset_content_type: application/zip
+      continue-on-error: true
+        
+    - name: Upload individual file
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./release/ha-github-card.js
+        asset_name: /ha-github-card.js
+        asset_content_type: application/javascript
+      continue-on-error: true        
