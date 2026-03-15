@@ -1,0 +1,28 @@
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "README.md"
+      - "docs/**"
+
+source:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "src/**"
+
+dependencies:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "package.json"
+      - "package-lock.json"
+
+ci:
+  - changed-files:
+    - any-glob-to-any-file:
+      - ".github/**"
+
+configuration:
+  - changed-files:
+    - any-glob-to-any-file:
+      - "vite.config.js"
+      - "tsconfig.json"
+      - "eslint.config.js"
