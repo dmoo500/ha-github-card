@@ -1,5 +1,15 @@
 # ha-github-card
 
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![GitHub release](https://img.shields.io/github/v/release/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/releases)
+[![License](https://img.shields.io/github/license/dmoo500/ha-github-card)](LICENSE)
+[![GitHub issues](https://img.shields.io/github/issues/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/issues)
+[![GitHub stars](https://img.shields.io/github/stars/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/stargazers)
+[![GitHub watchers](https://img.shields.io/github/watchers/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/watchers)
+[![Last Commit](https://img.shields.io/github/last-commit/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/commits/main)
+[![Maintained](https://img.shields.io/maintenance/yes/2026)](https://github.com/dmoo500/ha-github-card)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
+
 A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card that displays information from your GitHub repositories tracked via the official [GitHub integration](https://www.home-assistant.io/integrations/github/).
 
 ![Card Preview](docs/card_preview.png)
@@ -23,6 +33,8 @@ A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card that dis
 ## Installation
 
 ### HACS (recommended)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=dmoo500&repository=ha-github-card&category=lovelace)
 
 1. Open HACS → Frontend → "+ Explore & download repositories"
 2. Search for **ha-github-card** and install
