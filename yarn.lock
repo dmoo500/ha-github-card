@@ -1598,7 +1598,7 @@ __metadata:
     eslint-plugin-import: "npm:^2.32.0"
     eslint-plugin-n: "npm:^18.0.1"
     eslint-plugin-promise: "npm:^7.3.0"
-    lit: "npm:^3.0.0"
+    lit: "npm:^3.3.3"
     prettier: "npm:^3.8.3"
     typescript: "npm:^6.0.3"
     vite: "npm:^8.0.14"
@@ -2168,14 +2168,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lit@npm:^3.0.0":
-  version: 3.3.2
-  resolution: "lit@npm:3.3.2"
+"lit@npm:^3.3.3":
+  version: 3.3.3
+  resolution: "lit@npm:3.3.3"
   dependencies:
     "@lit/reactive-element": "npm:^2.1.0"
     lit-element: "npm:^4.2.0"
     lit-html: "npm:^3.3.0"
-  checksum: 10/0af8e06a0ef5bb6a84c3dd58b64b6b554baf4bc195d725951ae60bbd9999618364815dc4438bf949051e7f15497b71b2bb9f7514772b33c4526882bdfb805858
+  checksum: 10/238a6574447f6499b7a4c6e30a4da89907b095ea48d6291fb1de570e937745b84550ced459f9c51632c3010c964403e2d6ebe65caf1500f03779b6049f229f12
   languageName: node
   linkType: hard
 
