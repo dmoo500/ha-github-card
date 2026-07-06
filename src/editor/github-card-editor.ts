@@ -235,54 +235,58 @@ export class GithubCardEditor extends LitElement {
 
       <div class="section-label">GitHub Entities</div>
 
-      ${selectedEntities.length > 0
-        ? html`
-            <div class="entity-list">
-              ${selectedEntities.map((entityId) => {
-                const inStates = !!(this.hass && this.hass.states[entityId]);
-                const inRegistry = !!(
-                  this.hass && this.hass.entities?.[entityId]
-                );
-                const fuzzyMatch =
-                  !inStates &&
-                  !inRegistry &&
-                  entityId.includes("/") &&
-                  !!this.hass &&
-                  (() => {
-                    const [owner, repo] = entityId.split("/", 2);
-                    const sanitize = (s: string) =>
-                      s.toLowerCase().replace(/[^a-z0-9]/g, "_");
-                    const op = sanitize(owner);
-                    const rp = sanitize(repo);
-                    return Object.keys(this.hass!.states).some((id) => {
-                      const lower = id.toLowerCase();
-                      return lower.includes(op) && lower.includes(rp);
-                    });
-                  })();
-                const known = inStates || inRegistry || fuzzyMatch;
-                return html`
-                  <div class="entity-row ${known ? "" : "entity-warn"}">
-                    <span class="entity-id">${entityId}</span>
-                    ${!known
-                      ? html`<span
-                          class="warn-icon"
-                          title="Entity not found in HA — check ID"
-                          >⚠</span
-                        >`
-                      : nothing}
-                    <button
-                      class="remove-btn"
-                      @click="${() => this._removeEntity(entityId)}"
-                      aria-label="Remove"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                `;
-              })}
-            </div>
-          `
-        : html`<p class="hint">No entities added yet.</p>`}
+      ${
+        selectedEntities.length > 0
+          ? html`
+              <div class="entity-list">
+                ${selectedEntities.map((entityId) => {
+                  const inStates = !!(this.hass && this.hass.states[entityId]);
+                  const inRegistry = !!(
+                    this.hass && this.hass.entities?.[entityId]
+                  );
+                  const fuzzyMatch =
+                    !inStates &&
+                    !inRegistry &&
+                    entityId.includes("/") &&
+                    !!this.hass &&
+                    (() => {
+                      const [owner, repo] = entityId.split("/", 2);
+                      const sanitize = (s: string) =>
+                        s.toLowerCase().replace(/[^a-z0-9]/g, "_");
+                      const op = sanitize(owner);
+                      const rp = sanitize(repo);
+                      return Object.keys(this.hass!.states).some((id) => {
+                        const lower = id.toLowerCase();
+                        return lower.includes(op) && lower.includes(rp);
+                      });
+                    })();
+                  const known = inStates || inRegistry || fuzzyMatch;
+                  return html`
+                    <div class="entity-row ${known ? "" : "entity-warn"}">
+                      <span class="entity-id">${entityId}</span>
+                      ${
+                        !known
+                          ? html`<span
+                              class="warn-icon"
+                              title="Entity not found in HA — check ID"
+                              >⚠</span
+                            >`
+                          : nothing
+                      }
+                      <button
+                        class="remove-btn"
+                        @click="${() => this._removeEntity(entityId)}"
+                        aria-label="Remove"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  `;
+                })}
+              </div>
+            `
+          : html`<p class="hint">No entities added yet.</p>`
+      }
 
       <datalist id="github-entity-list">
         ${githubEntities.map((id) => html`<option value="${id}"></option>`)}
@@ -302,11 +306,13 @@ export class GithubCardEditor extends LitElement {
         <button class="add-btn" @click="${this._addCurrentEntity}">Add</button>
       </div>
       <p class="hint">
-        ${githubEntities.length > 0
-          ? html`${githubEntities.length} GitHub entities available — pick from
-            list or type any entity ID.`
-          : html`No GitHub entities auto-detected. Type the entity ID manually
-              (e.g. <em>sensor.owner_repo_watchers_count</em>).`}
+        ${
+          githubEntities.length > 0
+            ? html`${githubEntities.length} GitHub entities available — pick
+              from list or type any entity ID.`
+            : html`No GitHub entities auto-detected. Type the entity ID manually
+                (e.g. <em>sensor.owner_repo_watchers_count</em>).`
+        }
       </p>
 
       <div class="section-label">Rows — ${rows.length} / 5</div>
@@ -351,13 +357,15 @@ export class GithubCardEditor extends LitElement {
           </div>
         `,
       )}
-      ${rows.length < 5
-        ? html`
-            <button class="add-row-btn" @click="${() => this._addRow()}">
-              + Add Row
-            </button>
-          `
-        : nothing}
+      ${
+        rows.length < 5
+          ? html`
+              <button class="add-row-btn" @click="${() => this._addRow()}">
+                + Add Row
+              </button>
+            `
+          : nothing
+      }
 
       <div class="section-label">Conditional Colors</div>
       ${(
@@ -535,32 +543,36 @@ export class GithubCardEditor extends LitElement {
             `,
           )}
         </select>
-        ${current !== "none"
-          ? html`
-              <div class="icon-override-row">
-                ${iconOverride
-                  ? html`<ha-icon
-                      class="icon-preview"
-                      .icon="${iconOverride}"
-                    ></ha-icon>`
-                  : html`<span class="icon-preview-placeholder"
-                      >&#xFFFD;</span
-                    >`}
-                <input
-                  type="text"
-                  class="text-input icon-input"
-                  placeholder="mdi:star"
-                  .value="${iconOverride}"
-                  title="Override icon (leave empty to use sensor default)"
-                  @change="${(e: Event) =>
-                    this._setSlotIcon(
-                      current,
-                      (e.target as HTMLInputElement).value,
-                    )}"
-                />
-              </div>
-            `
-          : nothing}
+        ${
+          current !== "none"
+            ? html`
+                <div class="icon-override-row">
+                  ${
+                    iconOverride
+                      ? html`<ha-icon
+                          class="icon-preview"
+                          .icon="${iconOverride}"
+                        ></ha-icon>`
+                      : html`<span class="icon-preview-placeholder"
+                          >&#xFFFD;</span
+                        >`
+                  }
+                  <input
+                    type="text"
+                    class="text-input icon-input"
+                    placeholder="mdi:star"
+                    .value="${iconOverride}"
+                    title="Override icon (leave empty to use sensor default)"
+                    @change="${(e: Event) =>
+                      this._setSlotIcon(
+                        current,
+                        (e.target as HTMLInputElement).value,
+                      )}"
+                  />
+                </div>
+              `
+            : nothing
+        }
       </div>
     `;
   }
