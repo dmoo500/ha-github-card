@@ -128,9 +128,11 @@ export class GithubCard extends LitElement {
       <ha-card>
         ${this._renderCardHeader()}
         <div class="card-content ${this._config.compact ? "compact" : ""}">
-          ${entities.length === 0
-            ? html`<div class="empty">No GitHub entities configured.</div>`
-            : entities.map((e) => this._renderEntity(e))}
+          ${
+            entities.length === 0
+              ? html`<div class="empty">No GitHub entities configured.</div>`
+              : entities.map((e) => this._renderEntity(e))
+          }
         </div>
       </ha-card>
     `;
@@ -142,11 +144,13 @@ export class GithubCard extends LitElement {
     if (!title) return nothing;
     return html`
       <div class="card-header">
-        ${this._config.show_header_icon !== false
-          ? html`<div class="header-icon">
-              <ha-icon class="icon-header" .icon="${"mdi:github"}"></ha-icon>
-            </div>`
-          : nothing}
+        ${
+          this._config.show_header_icon !== false
+            ? html`<div class="header-icon">
+                <ha-icon class="icon-header" .icon="${"mdi:github"}"></ha-icon>
+              </div>`
+            : nothing
+        }
         <span class="header-title">${title}</span>
       </div>
     `;
@@ -170,16 +174,18 @@ export class GithubCard extends LitElement {
         <!-- Row 1: name (fixed left) + version (fixed right) -->
         <div class="entity-header">
           <div class="header-name">
-            ${this._config.show_avatar && a.owner_avatar
-              ? html`<img
-                  class="avatar"
-                  src="${a.owner_avatar}"
-                  alt="${a.owner_login ?? ""}"
-                  @error="${(e: Event) => {
-                    (e.target as any).style.display = "none";
-                  }}"
-                />`
-              : nothing}
+            ${
+              this._config.show_avatar && a.owner_avatar
+                ? html`<img
+                    class="avatar"
+                    src="${a.owner_avatar}"
+                    alt="${a.owner_login ?? ""}"
+                    @error="${(e: Event) => {
+                      (e.target as any).style.display = "none";
+                    }}"
+                  />`
+                : nothing
+            }
             <a
               class="repo-name"
               href="${a.html_url ?? "#"}"
@@ -189,15 +195,17 @@ export class GithubCard extends LitElement {
             >
           </div>
           <div class="header-version">
-            ${a.latest_release_tag
-              ? html`<a
-                  class="version-link"
-                  href="${a.latest_release_url ?? "#"}"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  >${a.latest_release_tag}</a
-                >`
-              : html`<span class="version-none">no release</span>`}
+            ${
+              a.latest_release_tag
+                ? html`<a
+                    class="version-link"
+                    href="${a.latest_release_url ?? "#"}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    >${a.latest_release_tag}</a
+                  >`
+                : html`<span class="version-none">no release</span>`
+            }
           </div>
         </div>
 
@@ -359,15 +367,17 @@ export class GithubCard extends LitElement {
       case "last_release":
         return html`
           ${this._slotIcon(key, entity)}
-          ${a.latest_release_tag
-            ? html`<a
-                class="slot-link"
-                href="${a.latest_release_url ?? "#"}"
-                target="_blank"
-                rel="noopener noreferrer"
-                >${a.latest_release_tag}</a
-              >`
-            : html`<span class="slot-value">—</span>`}
+          ${
+            a.latest_release_tag
+              ? html`<a
+                  class="slot-link"
+                  href="${a.latest_release_url ?? "#"}"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  >${a.latest_release_tag}</a
+                >`
+              : html`<span class="slot-value">—</span>`
+          }
         `;
       default:
         return html``;
