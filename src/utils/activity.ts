@@ -265,25 +265,67 @@ export function extractEventTimestamps(
   return events;
 }
 
+/** Upper bound of remembered live transitions per sensor. */
+const MAX_LIVE_ENTRIES_PER_SENSOR = 100;
+
 /**
- * Appends the live state when it is newer than the recorded history,
- * because the recorder commits with a delay.
+ * Remembers every live state transition of the source sensors, because the
+ * recorder commits with a delay and several updates may arrive before the
+ * history contains them.
  */
+export class LiveStateTracker {
+  private readonly _entries = new Map<string, HistoryStateEntry[]>();
+
+  /** Records new states; returns true if a transition was added. */
+  observe(states: Record<string, HassEntity>, entityIds: string[]): boolean {
+    let changed = false;
+    for (const id of entityIds) {
+      const live = states[id];
+      if (!live) continue;
+      const lu = Date.parse(live.last_updated) / 1000;
+      if (!Number.isFinite(lu)) continue;
+      const entries = this._entries.get(id) ?? [];
+      if (entries.length > 0 && entries[entries.length - 1].lu >= lu) continue;
+      entries.push({ s: live.state, a: live.attributes, lu });
+      if (entries.length > MAX_LIVE_ENTRIES_PER_SENSOR) entries.shift();
+      this._entries.set(id, entries);
+      changed = true;
+    }
+    return changed;
+  }
+
+  /** Drops transitions that are already part of the recorded history. */
+  prune(history: HistoryResponse): void {
+    for (const [id, entries] of this._entries) {
+      const newest = newestTimestamp(history[id] ?? []);
+      // Keep the latest entry as the reference for future transitions
+      const pending = entries.filter(
+        (e, i) => e.lu > newest || i === entries.length - 1,
+      );
+      this._entries.set(id, pending);
+    }
+  }
+
+  entries(): HistoryResponse {
+    return Object.fromEntries(this._entries);
+  }
+}
+
+function newestTimestamp(entries: HistoryStateEntry[]): number {
+  return entries.reduce((max, e) => Math.max(max, e.lu), -Infinity);
+}
+
+/** Appends live transitions that are newer than the recorded history. */
 export function mergeLiveStates(
   history: HistoryResponse,
-  states: Record<string, HassEntity>,
-  entityIds: string[],
+  live: HistoryResponse,
 ): HistoryResponse {
   const merged: HistoryResponse = { ...history };
-  for (const id of entityIds) {
-    const live = states[id];
-    if (!live) continue;
+  for (const [id, liveEntries] of Object.entries(live)) {
     const entries = merged[id] ?? [];
-    const lu = Date.parse(live.last_updated) / 1000;
-    const newest = entries.reduce((max, e) => Math.max(max, e.lu), -Infinity);
-    if (Number.isFinite(lu) && lu > newest) {
-      merged[id] = [...entries, { s: live.state, a: live.attributes, lu }];
-    }
+    const newest = newestTimestamp(entries);
+    const pending = liveEntries.filter((e) => e.lu > newest);
+    if (pending.length > 0) merged[id] = [...entries, ...pending];
   }
   return merged;
 }

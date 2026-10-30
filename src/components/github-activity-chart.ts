@@ -20,6 +20,7 @@ import {
   activityRequestKey,
   computeDailyActivity,
   fetchActivityHistory,
+  LiveStateTracker,
   mergeLiveStates,
   resolveActivityOptions,
   type ActivityDay,
@@ -57,6 +58,36 @@ export class GithubActivityChart extends LitElement {
 
   private _requestKey?: string;
   private _retryAt = 0;
+  private _midnightTimer?: ReturnType<typeof setTimeout>;
+  private readonly _live = new LiveStateTracker();
+
+  connectedCallback(): void {
+    super.connectedCallback();
+    this._scheduleMidnightRefresh();
+  }
+
+  disconnectedCallback(): void {
+    super.disconnectedCallback();
+    clearTimeout(this._midnightTimer);
+    this._midnightTimer = undefined;
+  }
+
+  /** The day window moves at local midnight even without any hass update. */
+  private _scheduleMidnightRefresh(): void {
+    clearTimeout(this._midnightTimer);
+    const now = new Date();
+    const nextMidnight = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + 1,
+    );
+    // Small offset so the new day has definitely started
+    const delay = nextMidnight.getTime() - now.getTime() + 1000;
+    this._midnightTimer = setTimeout(() => {
+      this._refresh();
+      this._scheduleMidnightRefresh();
+    }, delay);
+  }
 
   protected willUpdate(changed: PropertyValues<this>): void {
     if (
@@ -86,6 +117,7 @@ export class GithubActivityChart extends LitElement {
       return;
     }
 
+    this._live.observe(hass.states, entityIds);
     const now = new Date();
     const key = `${metrics.join(",")}#${activityRequestKey(hass, entityIds, range, now)}`;
     if (key === this._requestKey) return;
@@ -97,8 +129,9 @@ export class GithubActivityChart extends LitElement {
     fetchActivityHistory(hass, entityIds, range, now)
       .then((history) => {
         if (key !== this._requestKey) return;
+        this._live.prune(history);
         this._days = computeDailyActivity(
-          mergeLiveStates(history, hass.states, entityIds),
+          mergeLiveStates(history, this._live.entries()),
           this.sources,
           metrics,
           range,

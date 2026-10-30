@@ -31,8 +31,8 @@ export const cardHeaderStyles = css`
     padding: 14px 16px 8px;
     font-size: 1.05rem;
     font-weight: 600;
-    color: var(--primary-text-color, #24292e);
-    border-bottom: 1px solid var(--divider-color, #e1e4e8);
+    color: var(--gh-text, var(--primary-text-color, #24292e));
+    border-bottom: 1px solid var(--gh-border, var(--divider-color, #e1e4e8));
   }
 
   .header-icon {
@@ -51,6 +51,6 @@ export const cardHeaderStyles = css`
     --mdc-icon-size: 20px;
     width: 20px;
     height: 20px;
-    color: var(--primary-text-color, #24292e);
+    color: var(--gh-text, var(--primary-text-color, #24292e));
   }
 `;
