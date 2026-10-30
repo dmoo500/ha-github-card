@@ -2,7 +2,9 @@
 
 All notable changes to this project are documented in this file.
 
-## [Unreleased]
+## [0.1.0] - 2026-10-30
+
+First release with the activity chart. Includes everything from `0.1.0-beta.1` plus the following changes.
 
 ### Added
 

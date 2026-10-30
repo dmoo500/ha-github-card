@@ -2852,7 +2852,7 @@ var ht = 7, gt = 10, _t = 3e4, vt = 1e4, yt = 3, $ = class extends P {
 q([F({ attribute: !1 }), K("design:type", Object)], $.prototype, "hass", void 0), q([F({ attribute: !1 }), K("design:type", typeof Partial > "u" ? Object : Partial)], $.prototype, "sources", void 0), q([F({ attribute: !1 }), K("design:type", Object)], $.prototype, "options", void 0), q([I(), K("design:type", Array)], $.prototype, "_days", void 0), q([I(), K("design:type", Object)], $.prototype, "_loadState", void 0);
 // src/index.ts
 var bt = "https://github.com/dmoo500/ha-github-card";
-console.info("%c GITHUB-CARD %c 0.1.0-beta.1 ", "color: white; background: #24292e; font-weight: 700;", "color: #24292e; background: white; font-weight: 700;");
+console.info("%c GITHUB-CARD %c 0.1.0 ", "color: white; background: #24292e; font-weight: 700;", "color: #24292e; background: white; font-weight: 700;");
 var xt = [
 	["ha-github-activity-chart", $],
 	["ha-github-card", Y],
