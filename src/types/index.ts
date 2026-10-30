@@ -27,6 +27,7 @@ export interface HomeAssistant {
   /** Device registry — available in HA 2022.4+ */
   devices?: Record<string, DeviceRegistryEntry>;
   services: Record<string, Record<string, HassService>>;
+  callWS: <T>(message: { type: string; [key: string]: unknown }) => Promise<T>;
   callService: (
     domain: string,
     service: string,
@@ -103,8 +104,37 @@ export interface SlotColorRule {
   type?: "text" | "background";
 }
 
+/**
+ * Activity metrics derived from the history of the "latest ..." sensors.
+ * To add a metric, extend this union and its entry in ACTIVITY_METRICS.
+ */
+export type ActivityMetricKey =
+  "commits" | "pull_requests" | "issues" | "discussions";
+
+/**
+ * Selectable chart time ranges.
+ * To add a range (e.g. "14d", "30d"), extend this union and ACTIVITY_RANGES.
+ */
+export type ActivityRangeKey = "7d";
+
+/**
+ * Chart visualisations.
+ * To add one, extend this union, ACTIVITY_CHART_TYPES and the chart renderer.
+ */
+export type ActivityChartType = "line" | "bar";
+
+/** Activity chart options shared by all cards that embed the chart */
+export interface ActivityChartOptions {
+  /** Time range of the chart. Default: "7d" */
+  activity_range?: ActivityRangeKey;
+  /** Metrics to display. Default: commits, pull_requests, issues */
+  activity_metrics?: ActivityMetricKey[];
+  /** Chart visualisation. Default: "line" */
+  activity_chart_type?: ActivityChartType;
+}
+
 // GitHub Card Configuration
-export interface GithubCardConfig {
+export interface GithubCardConfig extends ActivityChartOptions {
   type: string;
   title?: string;
   /** List of entity_ids from the GitHub integration (domain: github) */
@@ -127,6 +157,21 @@ export interface GithubCardConfig {
   icons?: Partial<Record<SlotKey, string>>;
   /** Per-slot conditional color rules — first matching rule wins */
   slot_colors?: Partial<Record<SlotKey, SlotColorRule[]>>;
+  /** Show the activity chart below each repository table */
+  show_activity?: boolean;
+}
+
+// GitHub Activity Card Configuration (standalone chart per repository)
+export interface GithubActivityCardConfig extends ActivityChartOptions {
+  type: string;
+  /** Any entity_id of the GitHub repository device */
+  entity: string;
+  /** Card title — defaults to the repository name */
+  title?: string;
+  /** Show the card-level header bar */
+  show_header?: boolean;
+  /** Show the GitHub icon in the card header */
+  show_header_icon?: boolean;
 }
 
 // GitHub Entity Attributes (as provided by HA GitHub integration)
@@ -187,6 +232,8 @@ export interface GithubEntityData {
   attributes: GithubEntityAttributes;
   /** Icons discovered from sensor entity attributes (mdi:xxx strings) */
   slot_icons: Partial<Record<SlotKey, string>>;
+  /** Sensor entity per activity metric whose history feeds the activity chart */
+  activity_sources: Partial<Record<ActivityMetricKey, string>>;
 }
 
 // Lovelace Card Editor stub
