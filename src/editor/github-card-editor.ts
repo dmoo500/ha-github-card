@@ -508,11 +508,13 @@ export class GithubCardEditor extends LitElement {
         />
         Show activity chart below each repository
       </label>
-      ${cfg.show_activity
-        ? renderActivityOptionsEditor(cfg, (patch) =>
-            this._fireConfigChanged({ ...this._config!, ...patch }),
-          )
-        : nothing}
+      ${
+        cfg.show_activity
+          ? renderActivityOptionsEditor(cfg, (patch) =>
+              this._fireConfigChanged({ ...this._config!, ...patch }),
+            )
+          : nothing
+      }
     `;
   }
 

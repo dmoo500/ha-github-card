@@ -119,9 +119,11 @@ export class GithubActivityChart extends LitElement {
       <div class="activity">
         <div class="activity-header">
           <span class="activity-title">Activity · ${rangeLabel}</span>
-          ${this._loadState === "ready"
-            ? this._renderLegend(visibleMetrics)
-            : nothing}
+          ${
+            this._loadState === "ready"
+              ? this._renderLegend(visibleMetrics)
+              : nothing
+          }
         </div>
         ${this._renderBody(visibleMetrics)}
       </div>
@@ -179,9 +181,11 @@ export class GithubActivityChart extends LitElement {
       <div class="chart" role="img" aria-label="${this._ariaSummary(metrics)}">
         <div class="plot">
           ${this._chartRenderers[chartType](metrics)}
-          ${isEmpty
-            ? html`<div class="chart-empty">No activity in this period</div>`
-            : nothing}
+          ${
+            isEmpty
+              ? html`<div class="chart-empty">No activity in this period</div>`
+              : nothing
+          }
         </div>
         ${this._renderAxis()}
       </div>
@@ -200,9 +204,9 @@ export class GithubActivityChart extends LitElement {
         ${this._days.map(
           (day, i) => html`
             <span class="day-label">
-              ${(lastIdx - i) % labelStep === 0
-                ? this._formatDay(day.date)
-                : ""}
+              ${
+                (lastIdx - i) % labelStep === 0 ? this._formatDay(day.date) : ""
+              }
             </span>
           `,
         )}
@@ -221,8 +225,9 @@ export class GithubActivityChart extends LitElement {
                 day.counts[m] > 0
                   ? html`<div
                       class="segment"
-                      style="height:${(day.counts[m] / max) *
-                      100}%;background:${ACTIVITY_METRICS[m].color}"
+                      style="height:${
+                        (day.counts[m] / max) * 100
+                      }%;background:${ACTIVITY_METRICS[m].color}"
                     ></div>`
                   : nothing,
               )}
@@ -256,9 +261,11 @@ export class GithubActivityChart extends LitElement {
         aria-hidden="true"
       >
         <line class="baseline" x1="0" x2="100" y1="${y(0)}" y2="${y(0)}" />
-        ${max > 0
-          ? svg`<line class="gridline" x1="0" x2="100" y1="${y(max)}" y2="${y(max)}" />`
-          : nothing}
+        ${
+          max > 0
+            ? svg`<line class="gridline" x1="0" x2="100" y1="${y(max)}" y2="${y(max)}" />`
+            : nothing
+        }
         ${drawOrder.map(
           (m) => svg`
             <polyline
@@ -283,9 +290,11 @@ export class GithubActivityChart extends LitElement {
             : nothing,
         ),
       )}
-      ${max > 0
-        ? html`<span class="y-max" style="top:${y(max)}%">${max}</span>`
-        : nothing}
+      ${
+        max > 0
+          ? html`<span class="y-max" style="top:${y(max)}%">${max}</span>`
+          : nothing
+      }
       <div class="hover-columns" style="${this._columnsStyle()}">
         ${this._days.map(
           (day) =>

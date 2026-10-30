@@ -141,16 +141,18 @@ export class GithubCard extends LitElement {
         <!-- Row 1: name (fixed left) + version (fixed right) -->
         <div class="entity-header">
           <div class="header-name">
-            ${this._config.show_avatar && a.owner_avatar
-              ? html`<img
-                  class="avatar"
-                  src="${a.owner_avatar}"
-                  alt="${a.owner_login ?? ""}"
-                  @error="${(e: Event) => {
-                    (e.target as HTMLElement).style.display = "none";
-                  }}"
-                />`
-              : nothing}
+            ${
+              this._config.show_avatar && a.owner_avatar
+                ? html`<img
+                    class="avatar"
+                    src="${a.owner_avatar}"
+                    alt="${a.owner_login ?? ""}"
+                    @error="${(e: Event) => {
+                      (e.target as HTMLElement).style.display = "none";
+                    }}"
+                  />`
+                : nothing
+            }
             <a
               class="repo-name"
               href="${a.html_url ?? "#"}"
@@ -200,14 +202,16 @@ export class GithubCard extends LitElement {
               `
             : nothing;
         })}
-        ${this._config.show_activity
-          ? html`<ha-github-activity-chart
-              class="entity-activity"
-              .hass="${this.hass}"
-              .sources="${entity.activity_sources}"
-              .options="${this._config}"
-            ></ha-github-activity-chart>`
-          : nothing}
+        ${
+          this._config.show_activity
+            ? html`<ha-github-activity-chart
+                class="entity-activity"
+                .hass="${this.hass}"
+                .sources="${entity.activity_sources}"
+                .options="${this._config}"
+              ></ha-github-activity-chart>`
+            : nothing
+        }
       </div>
     `;
   }

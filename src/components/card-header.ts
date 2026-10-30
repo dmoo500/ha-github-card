@@ -11,11 +11,13 @@ export function renderCardHeader(options: CardHeaderOptions) {
   if (options.show_header === false || !options.title) return nothing;
   return html`
     <div class="card-header">
-      ${options.show_header_icon !== false
-        ? html`<div class="header-icon">
-            <ha-icon class="icon-header" .icon="${"mdi:github"}"></ha-icon>
-          </div>`
-        : nothing}
+      ${
+        options.show_header_icon !== false
+          ? html`<div class="header-icon">
+              <ha-icon class="icon-header" .icon="${"mdi:github"}"></ha-icon>
+            </div>`
+          : nothing
+      }
       <span class="header-title">${options.title}</span>
     </div>
   `;

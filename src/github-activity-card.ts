@@ -76,17 +76,21 @@ export class GithubActivityCard extends LitElement {
       <ha-card>
         ${renderCardHeader({ ...this._config, title })}
         <div class="card-content">
-          ${repo
-            ? html`<ha-github-activity-chart
-                .hass="${this.hass}"
-                .sources="${repo.activity_sources}"
-                .options="${this._config}"
-              ></ha-github-activity-chart>`
-            : html`<div class="empty">
-                ${this._config.entity
-                  ? `Entity "${this._config.entity}" not found.`
-                  : "No GitHub entity configured."}
-              </div>`}
+          ${
+            repo
+              ? html`<ha-github-activity-chart
+                  .hass="${this.hass}"
+                  .sources="${repo.activity_sources}"
+                  .options="${this._config}"
+                ></ha-github-activity-chart>`
+              : html`<div class="empty">
+                  ${
+                    this._config.entity
+                      ? `Entity "${this._config.entity}" not found.`
+                      : "No GitHub entity configured."
+                  }
+                </div>`
+          }
         </div>
       </ha-card>
     `;

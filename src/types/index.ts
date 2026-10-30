@@ -109,10 +109,7 @@ export interface SlotColorRule {
  * To add a metric, extend this union and its entry in ACTIVITY_METRICS.
  */
 export type ActivityMetricKey =
-  | "commits"
-  | "pull_requests"
-  | "issues"
-  | "discussions";
+  "commits" | "pull_requests" | "issues" | "discussions";
 
 /**
  * Selectable chart time ranges.
