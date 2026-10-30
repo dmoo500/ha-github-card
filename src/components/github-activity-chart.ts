@@ -1,7 +1,16 @@
-import { LitElement, html, css, nothing, type PropertyValues } from "lit";
+import {
+  LitElement,
+  html,
+  svg,
+  css,
+  nothing,
+  type PropertyValues,
+  type TemplateResult,
+} from "lit";
 import { property, state } from "lit/decorators.js";
 import type {
   ActivityChartOptions,
+  ActivityChartType,
   ActivityMetricKey,
   HomeAssistant,
 } from "../types/index.js";
@@ -21,6 +30,9 @@ import {
 const MAX_DAYS_WITH_WEEKDAY_LABELS = 7;
 /** Maximum number of x-axis labels before labels are thinned out. */
 const MAX_AXIS_LABELS = 10;
+
+/** Vertical plot area (viewBox units) kept free so lines and points are not clipped. */
+const LINE_PLOT_PADDING = 8;
 
 type LoadState = "loading" | "ready" | "error" | "no-sources";
 
@@ -129,7 +141,7 @@ export class GithubActivityChart extends LitElement {
       case "loading":
         return html`<div class="activity-message">Loading activity…</div>`;
       case "ready":
-        return this._renderBars(metrics);
+        return this._renderChart(metrics);
     }
   }
 
@@ -151,43 +163,137 @@ export class GithubActivityChart extends LitElement {
     `;
   }
 
-  private _renderBars(metrics: ActivityMetricKey[]) {
-    const max = Math.max(0, ...this._days.map((d) => d.total));
+  /** One renderer per chart type; the Record type enforces completeness. */
+  private readonly _chartRenderers: Record<
+    ActivityChartType,
+    (metrics: ActivityMetricKey[]) => TemplateResult
+  > = {
+    line: (metrics) => this._renderLine(metrics),
+    bar: (metrics) => this._renderBars(metrics),
+  };
+
+  private _renderChart(metrics: ActivityMetricKey[]) {
+    const { chartType } = this._resolved();
+    const isEmpty = this._days.every((d) => d.total === 0);
+    return html`
+      <div class="chart" role="img" aria-label="${this._ariaSummary(metrics)}">
+        <div class="plot">
+          ${this._chartRenderers[chartType](metrics)}
+          ${isEmpty
+            ? html`<div class="chart-empty">No activity in this period</div>`
+            : nothing}
+        </div>
+        ${this._renderAxis()}
+      </div>
+    `;
+  }
+
+  private _columnsStyle(): string {
+    return `grid-template-columns: repeat(${this._days.length}, 1fr)`;
+  }
+
+  private _renderAxis() {
     const labelStep = Math.ceil(this._days.length / MAX_AXIS_LABELS);
     const lastIdx = this._days.length - 1;
-
     return html`
-      <div
-        class="chart"
-        role="img"
-        aria-label="${this._ariaSummary(metrics)}"
-        style="grid-template-columns: repeat(${this._days.length}, 1fr)"
-      >
+      <div class="axis" style="${this._columnsStyle()}">
         ${this._days.map(
           (day, i) => html`
-            <div class="day" title="${this._dayTooltip(day, metrics)}">
-              <div class="bar">
-                ${metrics.map((m) =>
-                  day.counts[m] > 0
-                    ? html`<div
-                        class="segment"
-                        style="height:${(day.counts[m] / max) *
-                        100}%;background:${ACTIVITY_METRICS[m].color}"
-                      ></div>`
-                    : nothing,
-                )}
-              </div>
-              <span class="day-label">
-                ${(lastIdx - i) % labelStep === 0
-                  ? this._formatDay(day.date)
-                  : ""}
-              </span>
+            <span class="day-label">
+              ${(lastIdx - i) % labelStep === 0
+                ? this._formatDay(day.date)
+                : ""}
+            </span>
+          `,
+        )}
+      </div>
+    `;
+  }
+
+  private _renderBars(metrics: ActivityMetricKey[]) {
+    const max = Math.max(0, ...this._days.map((d) => d.total));
+    return html`
+      <div class="bars" style="${this._columnsStyle()}">
+        ${this._days.map(
+          (day) => html`
+            <div class="bar" title="${this._dayTooltip(day, metrics)}">
+              ${metrics.map((m) =>
+                day.counts[m] > 0
+                  ? html`<div
+                      class="segment"
+                      style="height:${(day.counts[m] / max) *
+                      100}%;background:${ACTIVITY_METRICS[m].color}"
+                    ></div>`
+                  : nothing,
+              )}
             </div>
           `,
         )}
-        ${max === 0
-          ? html`<div class="chart-empty">No activity in this period</div>`
+      </div>
+    `;
+  }
+
+  private _renderLine(metrics: ActivityMetricKey[]) {
+    const max = Math.max(
+      0,
+      ...this._days.flatMap((d) => metrics.map((m) => d.counts[m])),
+    );
+    const count = this._days.length;
+    // Points sit in the middle of each day column so they align with the axis
+    const x = (i: number) => ((i + 0.5) / count) * 100;
+    const y = (value: number) =>
+      100 -
+      LINE_PLOT_PADDING -
+      (max > 0 ? (value / max) * (100 - 2 * LINE_PLOT_PADDING) : 0);
+    // Draw the first metric last so it stays on top when lines overlap
+    const drawOrder = [...metrics].reverse();
+
+    return html`
+      <svg
+        class="lines"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+      >
+        <line class="baseline" x1="0" x2="100" y1="${y(0)}" y2="${y(0)}" />
+        ${max > 0
+          ? svg`<line class="gridline" x1="0" x2="100" y1="${y(max)}" y2="${y(max)}" />`
           : nothing}
+        ${drawOrder.map(
+          (m) => svg`
+            <polyline
+              class="series"
+              stroke="${ACTIVITY_METRICS[m].color}"
+              points="${this._days
+                .map((d, i) => `${x(i)},${y(d.counts[m])}`)
+                .join(" ")}"
+            />
+          `,
+        )}
+      </svg>
+      ${drawOrder.map((m) =>
+        this._days.map((d, i) =>
+          d.counts[m] > 0
+            ? html`<span
+                class="point"
+                style="left:${x(i)}%;top:${y(
+                  d.counts[m],
+                )}%;background:${ACTIVITY_METRICS[m].color}"
+              ></span>`
+            : nothing,
+        ),
+      )}
+      ${max > 0
+        ? html`<span class="y-max" style="top:${y(max)}%">${max}</span>`
+        : nothing}
+      <div class="hover-columns" style="${this._columnsStyle()}">
+        ${this._days.map(
+          (day) =>
+            html`<div
+              class="hover-column"
+              title="${this._dayTooltip(day, metrics)}"
+            ></div>`,
+        )}
       </div>
     `;
   }
@@ -226,7 +332,7 @@ export class GithubActivityChart extends LitElement {
   static styles = css`
     :host {
       display: block;
-      --gh-activity-bar-height: 64px;
+      --gh-activity-chart-height: 64px;
     }
 
     .activity {
@@ -277,23 +383,31 @@ export class GithubActivityChart extends LitElement {
     }
 
     .chart {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .plot {
       position: relative;
+      height: var(--gh-activity-chart-height);
+    }
+
+    .bars,
+    .axis,
+    .hover-columns {
       display: grid;
       gap: 4px;
     }
 
-    .day {
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      gap: 4px;
-      min-width: 0;
+    .bars {
+      height: 100%;
     }
 
     .bar {
-      height: var(--gh-activity-bar-height);
       display: flex;
       flex-direction: column-reverse;
+      min-width: 0;
       border-radius: 3px;
       overflow: hidden;
       background: color-mix(
@@ -308,6 +422,70 @@ export class GithubActivityChart extends LitElement {
       flex-shrink: 0;
     }
 
+    .lines {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .baseline,
+    .gridline {
+      stroke: var(--divider-color, rgba(0, 0, 0, 0.12));
+      stroke-width: 1;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .gridline {
+      stroke-dasharray: 3 3;
+    }
+
+    .series {
+      fill: none;
+      stroke-width: 2;
+      stroke-linejoin: round;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .point {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 0 1.5px var(--card-background-color, #fff);
+      pointer-events: none;
+    }
+
+    .y-max {
+      position: absolute;
+      left: 0;
+      transform: translateY(-120%);
+      font-size: 0.62rem;
+      line-height: 1;
+      color: var(--secondary-text-color, #586069);
+      pointer-events: none;
+    }
+
+    .hover-columns {
+      position: absolute;
+      inset: 0;
+    }
+
+    .hover-column {
+      border-radius: 3px;
+    }
+
+    .hover-column:hover {
+      background: color-mix(
+        in srgb,
+        var(--primary-text-color, #24292e) 6%,
+        transparent
+      );
+    }
+
     .day-label {
       font-size: 0.68rem;
       text-align: center;
@@ -319,7 +497,7 @@ export class GithubActivityChart extends LitElement {
 
     .chart-empty {
       position: absolute;
-      inset: 0 0 1.2em 0;
+      inset: 0;
       display: flex;
       align-items: center;
       justify-content: center;

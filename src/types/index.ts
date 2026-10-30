@@ -120,12 +120,20 @@ export type ActivityMetricKey =
  */
 export type ActivityRangeKey = "7d";
 
+/**
+ * Chart visualisations.
+ * To add one, extend this union, ACTIVITY_CHART_TYPES and the chart renderer.
+ */
+export type ActivityChartType = "line" | "bar";
+
 /** Activity chart options shared by all cards that embed the chart */
 export interface ActivityChartOptions {
   /** Time range of the chart. Default: "7d" */
   activity_range?: ActivityRangeKey;
   /** Metrics to display. Default: commits, pull_requests, issues */
   activity_metrics?: ActivityMetricKey[];
+  /** Chart visualisation. Default: "line" */
+  activity_chart_type?: ActivityChartType;
 }
 
 // GitHub Card Configuration

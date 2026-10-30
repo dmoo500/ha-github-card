@@ -103,6 +103,7 @@ rows:
 | `show_activity`     | `boolean` | `false` | Show the [activity chart](#activity-chart) below each repository |
 | `activity_range`    | `string`  | `7d`    | Activity chart time range (see [Activity Chart](#activity-chart)) |
 | `activity_metrics`  | `list`    | `[commits, pull_requests, issues]` | Activity chart metrics          |
+| `activity_chart_type` | `string` | `line`  | Activity chart type: `line` or `bar` (stacked bars)              |
 
 **Default rows:**
 ```yaml
@@ -187,6 +188,7 @@ title: My Repo                        # optional, defaults to the repository nam
 show_header: true
 show_header_icon: true
 activity_range: 7d
+activity_chart_type: line             # or "bar"
 activity_metrics: [commits, pull_requests, issues, discussions]
 ```
 
@@ -194,8 +196,9 @@ activity_metrics: [commits, pull_requests, issues, discussions]
 |--------------------|---------------------------------------------------------|------------------------------------|
 | `activity_range`   | `7d`                                                    | `7d`                               |
 | `activity_metrics` | `commits`, `pull_requests`, `issues`, `discussions`     | `[commits, pull_requests, issues]` |
+| `activity_chart_type` | `line` (one line per metric), `bar` (stacked bars)   | `line`                             |
 
-Bar colors can be themed with `--gh-activity-commits-color`, `--gh-activity-pull-requests-color`, `--gh-activity-issues-color` and `--gh-activity-discussions-color`.
+Bar colors can be themed with `--gh-activity-commits-color`, `--gh-activity-pull-requests-color`, `--gh-activity-issues-color` and `--gh-activity-discussions-color`, the chart height with `--gh-activity-chart-height` (default `64px`).
 
 **Limitations**
 
@@ -214,7 +217,7 @@ yarn lint       # ESLint
 
 ### Adding activity time ranges or metrics
 
-Time ranges and metrics are defined in registries in `src/utils/activity.ts`. To add e.g. a 30-day range, extend the `ActivityRangeKey` type in `src/types/index.ts` and add an entry to `ACTIVITY_RANGES` — the editor, the chart and both cards pick it up automatically. Metrics work the same way via `ActivityMetricKey` and `ACTIVITY_METRICS`.
+Time ranges and metrics are defined in registries in `src/utils/activity.ts`. To add e.g. a 30-day range, extend the `ActivityRangeKey` type in `src/types/index.ts` and add an entry to `ACTIVITY_RANGES` — the editor, the chart and both cards pick it up automatically. Metrics work the same way via `ActivityMetricKey` and `ACTIVITY_METRICS`. New chart types need an `ActivityChartType` member, an `ACTIVITY_CHART_TYPES` entry and a renderer in `_chartRenderers` of `src/components/github-activity-chart.ts` (enforced by the type checker).
 
 ## License
 

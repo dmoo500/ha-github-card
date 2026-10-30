@@ -1,5 +1,6 @@
 import type {
   ActivityChartOptions,
+  ActivityChartType,
   ActivityMetricKey,
   ActivityRangeKey,
   HassEntity,
@@ -94,6 +95,24 @@ export const ACTIVITY_RANGE_KEYS = Object.keys(
 
 export const DEFAULT_ACTIVITY_RANGE: ActivityRangeKey = "7d";
 
+export interface ActivityChartTypeDefinition {
+  label: string;
+}
+
+export const ACTIVITY_CHART_TYPES: Record<
+  ActivityChartType,
+  ActivityChartTypeDefinition
+> = {
+  line: { label: "Line" },
+  bar: { label: "Stacked bars" },
+};
+
+export const ACTIVITY_CHART_TYPE_KEYS = Object.keys(
+  ACTIVITY_CHART_TYPES,
+) as ActivityChartType[];
+
+export const DEFAULT_ACTIVITY_CHART_TYPE: ActivityChartType = "line";
+
 // ------------------------------------------------------------------
 // Options & sensor detection
 // ------------------------------------------------------------------
@@ -101,6 +120,7 @@ export const DEFAULT_ACTIVITY_RANGE: ActivityRangeKey = "7d";
 export interface ResolvedActivityOptions {
   range: ActivityRangeKey;
   metrics: ActivityMetricKey[];
+  chartType: ActivityChartType;
 }
 
 /** Validates user config and applies defaults (unknown values are ignored). */
@@ -114,9 +134,15 @@ export function resolveActivityOptions(
   const metrics = ACTIVITY_METRIC_KEYS.filter((key) =>
     options.activity_metrics?.includes(key),
   );
+  const chartType =
+    options.activity_chart_type &&
+    options.activity_chart_type in ACTIVITY_CHART_TYPES
+      ? options.activity_chart_type
+      : DEFAULT_ACTIVITY_CHART_TYPE;
   return {
     range,
     metrics: metrics.length > 0 ? metrics : [...DEFAULT_ACTIVITY_METRICS],
+    chartType,
   };
 }
 

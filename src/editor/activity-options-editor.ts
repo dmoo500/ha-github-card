@@ -1,10 +1,13 @@
 import { html, css } from "lit";
 import type {
   ActivityChartOptions,
+  ActivityChartType,
   ActivityMetricKey,
   ActivityRangeKey,
 } from "../types/index.js";
 import {
+  ACTIVITY_CHART_TYPES,
+  ACTIVITY_CHART_TYPE_KEYS,
   ACTIVITY_METRICS,
   ACTIVITY_METRIC_KEYS,
   ACTIVITY_RANGES,
@@ -21,7 +24,7 @@ export function renderActivityOptionsEditor(
   options: ActivityChartOptions,
   onChange: (patch: ActivityChartOptions) => void,
 ) {
-  const { range, metrics } = resolveActivityOptions(options);
+  const { range, metrics, chartType } = resolveActivityOptions(options);
 
   const toggleMetric = (key: ActivityMetricKey, enabled: boolean) => {
     const next = enabled ? [...metrics, key] : metrics.filter((m) => m !== key);
@@ -45,6 +48,25 @@ export function renderActivityOptionsEditor(
           (key) => html`
             <option value="${key}" ?selected="${key === range}">
               ${ACTIVITY_RANGES[key].label}
+            </option>
+          `,
+        )}
+      </select>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="activity-chart-type">Chart Type</label>
+      <select
+        id="activity-chart-type"
+        @change="${(e: Event) =>
+          onChange({
+            activity_chart_type: (e.target as HTMLSelectElement)
+              .value as ActivityChartType,
+          })}"
+      >
+        ${ACTIVITY_CHART_TYPE_KEYS.map(
+          (key) => html`
+            <option value="${key}" ?selected="${key === chartType}">
+              ${ACTIVITY_CHART_TYPES[key].label}
             </option>
           `,
         )}
