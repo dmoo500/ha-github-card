@@ -209,15 +209,30 @@ export interface ActivityDay {
   total: number;
 }
 
-const INVALID_STATES = new Set(["unavailable", "unknown", ""]);
+/**
+ * Extra history fetched before the chart window, so a sensor that is
+ * unavailable exactly at the window start still has a known baseline.
+ */
+export const BASELINE_LOOKBACK_DAYS = 1;
+
+/** Sensor not reachable: says nothing about the current item. */
+const UNAVAILABLE_STATES = new Set(["unavailable", ""]);
+/** The integration reports no item (e.g. no issue exists yet). */
+const NO_ITEM_STATE = "unknown";
 
 /**
- * Returns timestamps (ms) of new events in a sensor history. The first valid
- * entry is the baseline (state at window start) and is never counted.
+ * Returns timestamps (ms) of new events in a sensor history.
+ *
+ * Entries before `windowStartMs` only establish the baseline. Within the
+ * window, the first known item is only counted when the baseline is known:
+ * either an earlier item or an explicit "no item" (`unknown`) state. A sensor
+ * recovering from `unavailable` without a known baseline is not counted,
+ * because its item most likely existed before.
  */
 export function extractEventTimestamps(
   entries: HistoryStateEntry[],
   metric: ActivityMetricDefinition,
+  windowStartMs = -Infinity,
 ): number[] {
   const sorted = [...entries].sort((x, y) => x.lu - y.lu);
   const seen = new Set<string>();
@@ -226,7 +241,11 @@ export function extractEventTimestamps(
   const events: number[] = [];
 
   for (const entry of sorted) {
-    if (INVALID_STATES.has(entry.s)) continue;
+    if (UNAVAILABLE_STATES.has(entry.s)) continue;
+    if (entry.s === NO_ITEM_STATE) {
+      hasBaseline = true;
+      continue;
+    }
     const attr = entry.a?.[metric.identityAttribute];
     // Without attributes (e.g. excluded from recorder) the state is the best identity
     const identity =
@@ -236,7 +255,8 @@ export function extractEventTimestamps(
       metric.identityMode === "increasing" && Number.isFinite(numeric);
 
     const isNew = useNumeric ? numeric > maxNumeric : !seen.has(identity);
-    if (hasBaseline && isNew) events.push(entry.lu * 1000);
+    const ts = entry.lu * 1000;
+    if (hasBaseline && isNew && ts >= windowStartMs) events.push(ts);
 
     hasBaseline = true;
     seen.add(identity);
@@ -291,6 +311,7 @@ export function computeDailyActivity(
     const timestamps = extractEventTimestamps(
       history[entityId] ?? [],
       ACTIVITY_METRICS[metric],
+      days[0].date.getTime(),
     );
     for (const ts of timestamps) {
       const idx = indexByDay.get(localDateKey(new Date(ts)));
@@ -335,7 +356,9 @@ export function fetchActivityHistory(
   const cached = historyCache.get(key);
   if (cached) return cached;
 
-  const [start] = getActivityDays(range, now);
+  const [windowStart] = getActivityDays(range, now);
+  const start = new Date(windowStart);
+  start.setDate(start.getDate() - BASELINE_LOOKBACK_DAYS);
   const request = hass
     .callWS<HistoryResponse>({
       type: "history/history_during_period",

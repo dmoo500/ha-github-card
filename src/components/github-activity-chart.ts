@@ -34,6 +34,9 @@ const MAX_AXIS_LABELS = 10;
 /** Vertical plot area (viewBox units) kept free so lines and points are not clipped. */
 const LINE_PLOT_PADDING = 8;
 
+/** Minimum delay before a failed history request is retried. */
+const RETRY_DELAY_MS = 30_000;
+
 type LoadState = "loading" | "ready" | "error" | "no-sources";
 
 /**
@@ -53,6 +56,7 @@ export class GithubActivityChart extends LitElement {
   @state() private _loadState: LoadState = "loading";
 
   private _requestKey?: string;
+  private _retryAt = 0;
 
   protected willUpdate(changed: PropertyValues<this>): void {
     if (
@@ -85,6 +89,8 @@ export class GithubActivityChart extends LitElement {
     const now = new Date();
     const key = `${metrics.join(",")}#${activityRequestKey(hass, entityIds, range, now)}`;
     if (key === this._requestKey) return;
+    // hass updates arrive frequently; throttle retries after a failure
+    if (this._loadState === "error" && Date.now() < this._retryAt) return;
     this._requestKey = key;
     if (this._loadState !== "ready") this._loadState = "loading";
 
@@ -102,6 +108,9 @@ export class GithubActivityChart extends LitElement {
       })
       .catch(() => {
         if (key !== this._requestKey) return;
+        // Allow a later update to retry (the helper evicts failed requests)
+        this._requestKey = undefined;
+        this._retryAt = Date.now() + RETRY_DELAY_MS;
         this._loadState = "error";
       });
   }
@@ -331,7 +340,9 @@ export class GithubActivityChart extends LitElement {
       const total = this._days.reduce((sum, d) => sum + d.counts[m], 0);
       return `${total} ${ACTIVITY_METRICS[m].label}`;
     });
-    return `Activity: ${totals.join(", ")}`;
+    // Daily counts are otherwise only available in hover titles
+    const daily = this._days.map((d) => this._dayTooltip(d, metrics));
+    return `Activity: ${totals.join(", ")}. ${daily.join("; ")}`;
   }
 
   // ------------------------------------------------------------------
@@ -341,7 +352,6 @@ export class GithubActivityChart extends LitElement {
   static styles = css`
     :host {
       display: block;
-      --gh-activity-chart-height: 64px;
     }
 
     .activity {
@@ -399,7 +409,7 @@ export class GithubActivityChart extends LitElement {
 
     .plot {
       position: relative;
-      height: var(--gh-activity-chart-height);
+      height: var(--gh-activity-chart-height, 64px);
     }
 
     .bars,
