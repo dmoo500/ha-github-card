@@ -198,6 +198,7 @@ export class GithubActivityChart extends LitElement {
         </div>
         ${this._renderAxis()}
       </div>
+      ${this._renderDataTable(metrics)}
     `;
   }
 
@@ -340,9 +341,43 @@ export class GithubActivityChart extends LitElement {
       const total = this._days.reduce((sum, d) => sum + d.counts[m], 0);
       return `${total} ${ACTIVITY_METRICS[m].label}`;
     });
-    // Daily counts are otherwise only available in hover titles
-    const daily = this._days.map((d) => this._dayTooltip(d, metrics));
-    return `Activity: ${totals.join(", ")}. ${daily.join("; ")}`;
+    return `Activity: ${totals.join(", ")}`;
+  }
+
+  /** Visually hidden per-day table for screen readers (the chart is role="img"). */
+  private _renderDataTable(metrics: ActivityMetricKey[]) {
+    const locale = this.hass?.language;
+    return html`
+      <table class="visually-hidden">
+        <caption>
+          Daily activity
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            ${metrics.map(
+              (m) => html`<th scope="col">${ACTIVITY_METRICS[m].label}</th>`,
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          ${this._days.map(
+            (day) => html`
+              <tr>
+                <th scope="row">
+                  ${day.date.toLocaleDateString(locale, {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                  })}
+                </th>
+                ${metrics.map((m) => html`<td>${day.counts[m]}</td>`)}
+              </tr>
+            `,
+          )}
+        </tbody>
+      </table>
+    `;
   }
 
   // ------------------------------------------------------------------
@@ -352,6 +387,18 @@ export class GithubActivityChart extends LitElement {
   static styles = css`
     :host {
       display: block;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .activity {

@@ -2433,6 +2433,7 @@ var ft = 7, pt = 10, mt = 3e4, $ = class extends P {
         </div>
         ${this._renderAxis()}
       </div>
+      ${this._renderDataTable(e)}
     `;
 	}
 	_columnsStyle() {
@@ -2512,13 +2513,54 @@ var ft = 7, pt = 10, mt = 3e4, $ = class extends P {
 		})}: ${t.map((t) => `${e.counts[t]} ${L[t].label}`).join(", ")}`;
 	}
 	_ariaSummary(e) {
-		let t = e.map((e) => `${this._days.reduce((t, n) => t + n.counts[e], 0)} ${L[e].label}`), n = this._days.map((t) => this._dayTooltip(t, e));
-		return `Activity: ${t.join(", ")}. ${n.join("; ")}`;
+		return `Activity: ${e.map((e) => `${this._days.reduce((t, n) => t + n.counts[e], 0)} ${L[e].label}`).join(", ")}`;
+	}
+	_renderDataTable(e) {
+		let t = this.hass?.language;
+		return T`
+      <table class="visually-hidden">
+        <caption>
+          Daily activity
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Day</th>
+            ${e.map((e) => T`<th scope="col">${L[e].label}</th>`)}
+          </tr>
+        </thead>
+        <tbody>
+          ${this._days.map((n) => T`
+              <tr>
+                <th scope="row">
+                  ${n.date.toLocaleDateString(t, {
+			weekday: "long",
+			day: "numeric",
+			month: "long"
+		})}
+                </th>
+                ${e.map((e) => T`<td>${n.counts[e]}</td>`)}
+              </tr>
+            `)}
+        </tbody>
+      </table>
+    `;
 	}
 	static {
 		this.styles = o`
     :host {
       display: block;
+    }
+
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0 0 0 0);
+      white-space: nowrap;
+      border: 0;
     }
 
     .activity {
