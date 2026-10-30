@@ -11,6 +11,10 @@ import {
   formatDate,
   formatCount,
 } from "./utils/github.js";
+import {
+  cardHeaderStyles,
+  renderCardHeader,
+} from "./components/card-header.js";
 
 const DEFAULT_ROWS: SlotKey[][] = [
   ["watchers", "stars", "last_commit"],
@@ -89,7 +93,8 @@ export class GithubCard extends LitElement {
   }
 
   getCardSize(): number {
-    return (this._config?.entities?.length ?? 1) * 3 + 1;
+    const perEntity = this._config?.show_activity ? 5 : 3;
+    return (this._config?.entities?.length ?? 1) * perEntity + 1;
   }
 
   // ------------------------------------------------------------------
@@ -106,7 +111,7 @@ export class GithubCard extends LitElement {
 
     return html`
       <ha-card>
-        ${this._renderCardHeader()}
+        ${renderCardHeader(this._config)}
         <div class="card-content ${this._config.compact ? "compact" : ""}">
           ${
             entities.length === 0
@@ -115,24 +120,6 @@ export class GithubCard extends LitElement {
           }
         </div>
       </ha-card>
-    `;
-  }
-
-  private _renderCardHeader() {
-    if (this._config.show_header === false) return nothing;
-    const title = this._config.title;
-    if (!title) return nothing;
-    return html`
-      <div class="card-header">
-        ${
-          this._config.show_header_icon !== false
-            ? html`<div class="header-icon">
-                <ha-icon class="icon-header" .icon="${"mdi:github"}"></ha-icon>
-              </div>`
-            : nothing
-        }
-        <span class="header-title">${title}</span>
-      </div>
     `;
   }
 
@@ -160,7 +147,7 @@ export class GithubCard extends LitElement {
                   src="${a.owner_avatar}"
                   alt="${a.owner_login ?? ""}"
                   @error="${(e: Event) => {
-                    (e.target as HTMLImageElement).style.display = "none";
+                    (e.target as HTMLElement).style.display = "none";
                   }}"
                 />`
               : nothing}
@@ -213,6 +200,14 @@ export class GithubCard extends LitElement {
               `
             : nothing;
         })}
+        ${this._config.show_activity
+          ? html`<ha-github-activity-chart
+              class="entity-activity"
+              .hass="${this.hass}"
+              .sources="${entity.activity_sources}"
+              .options="${this._config}"
+            ></ha-github-activity-chart>`
+          : nothing}
       </div>
     `;
   }
@@ -345,231 +340,213 @@ export class GithubCard extends LitElement {
   // Styles
   // ------------------------------------------------------------------
 
-  static styles = css`
-    :host {
-      --gh-accent: var(--primary-color, #0366d6);
-      --gh-text: var(--primary-text-color, #24292e);
-      --gh-text-sec: var(--secondary-text-color, #586069);
-      --gh-border: var(--divider-color, #e1e4e8);
-      --gh-bg-row1: var(--secondary-background-color, #f6f8fa);
-      --gh-link: var(--primary-color, #0366d6);
-    }
+  static styles = [
+    cardHeaderStyles,
+    css`
+      :host {
+        --gh-accent: var(--primary-color, #0366d6);
+        --gh-text: var(--primary-text-color, #24292e);
+        --gh-text-sec: var(--secondary-text-color, #586069);
+        --gh-border: var(--divider-color, #e1e4e8);
+        --gh-bg-row1: var(--secondary-background-color, #f6f8fa);
+        --gh-link: var(--primary-color, #0366d6);
+      }
 
-    ha-card {
-      overflow: hidden;
-      border-radius: var(--ha-card-border-radius, 12px);
-    }
+      ha-card {
+        overflow: hidden;
+        border-radius: var(--ha-card-border-radius, 12px);
+      }
 
-    /* ---- Card-level header ---- */
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 16px 8px;
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: var(--gh-text);
-      border-bottom: 1px solid var(--gh-border);
-    }
+      /* ---- Content wrapper ---- */
+      .card-content {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
 
-    .header-icon {
-      width: 20px;
-      height: 20px;
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
+      .card-content.compact {
+        gap: 6px;
+      }
 
-    .header-title {
-      flex: 1;
-    }
+      .empty {
+        color: var(--gh-text-sec);
+        padding: 16px;
+        text-align: center;
+        font-style: italic;
+      }
 
-    /* ---- Content wrapper ---- */
-    .card-content {
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .card-content.compact {
-      gap: 6px;
-    }
-
-    .empty {
-      color: var(--gh-text-sec);
-      padding: 16px;
-      text-align: center;
-      font-style: italic;
-    }
-
-    /* ================================================
+      /* ================================================
        Entity card — table-like 3-row layout
        ================================================ */
-    .entity-card {
-      border: 1px solid var(--gh-border);
-      border-radius: 8px;
-      overflow: hidden;
-    }
+      .entity-card {
+        border: 1px solid var(--gh-border);
+        border-radius: 8px;
+        overflow: hidden;
+      }
 
-    /* ---- Row 1: name | version (fixed) ---- */
-    .entity-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding: 10px 12px;
-      background: var(--gh-bg-row1);
-    }
+      /* ---- Row 1: name | version (fixed) ---- */
+      .entity-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 10px 12px;
+        background: var(--gh-bg-row1);
+      }
 
-    .header-name {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      min-width: 0;
-      flex: 1;
-    }
+      .header-name {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        flex: 1;
+      }
 
-    .avatar {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+      .avatar {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
 
-    .repo-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--gh-link);
-      text-decoration: none;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+      .repo-name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--gh-link);
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
-    .repo-name:hover {
-      text-decoration: underline;
-    }
+      .repo-name:hover {
+        text-decoration: underline;
+      }
 
-    .header-version {
-      flex-shrink: 0;
-    }
+      .header-version {
+        flex-shrink: 0;
+      }
 
-    .version-link {
-      font-size: 0.78rem;
-      font-weight: 500;
-      color: var(--gh-link);
-      text-decoration: none;
-      background: color-mix(in srgb, var(--gh-link) 12%, transparent);
-      border-radius: 10px;
-      padding: 2px 9px;
-    }
+      .version-link {
+        font-size: 0.78rem;
+        font-weight: 500;
+        color: var(--gh-link);
+        text-decoration: none;
+        background: color-mix(in srgb, var(--gh-link) 12%, transparent);
+        border-radius: 10px;
+        padding: 2px 9px;
+      }
 
-    .version-link:hover {
-      text-decoration: underline;
-    }
+      .version-link:hover {
+        text-decoration: underline;
+      }
 
-    .version-none {
-      font-size: 0.78rem;
-      color: var(--gh-text-sec);
-      opacity: 0.55;
-    }
+      .version-none {
+        font-size: 0.78rem;
+        color: var(--gh-text-sec);
+        opacity: 0.55;
+      }
 
-    /* ---- Rows 2 & 3: configurable grid ---- */
-    .entity-row {
-      display: grid; /* columns set inline via style="" */
-    }
+      /* ---- Rows 2 & 3: configurable grid ---- */
+      .entity-row {
+        display: grid; /* columns set inline via style="" */
+      }
 
-    /* ---- Slot cell ---- */
-    .slot-cell {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      padding: 9px 12px;
-      font-size: 0.82rem;
-      color: var(--gh-text-sec);
-      min-width: 0;
-      overflow: hidden;
-    }
+      /* ---- Slot cell ---- */
+      .slot-cell {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 9px 12px;
+        font-size: 0.82rem;
+        color: var(--gh-text-sec);
+        min-width: 0;
+        overflow: hidden;
+      }
 
-    .compact .slot-cell {
-      padding: 6px 10px;
-    }
+      .compact .slot-cell {
+        padding: 6px 10px;
+      }
 
-    .slot-cell + .slot-cell {
-      /* no border between cells */
-    }
+      .slot-cell + .slot-cell {
+        /* no border between cells */
+      }
 
-    .slot-value {
-      font-weight: 700;
-      color: var(--gh-text);
-      flex-shrink: 0;
-    }
+      .slot-value {
+        font-weight: 700;
+        color: var(--gh-text);
+        flex-shrink: 0;
+      }
 
-    .slot-label {
-      font-size: 0.72rem;
-      color: var(--gh-text-sec);
-      opacity: 0.8;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+      .slot-label {
+        font-size: 0.72rem;
+        color: var(--gh-text-sec);
+        opacity: 0.8;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
-    .slot-link {
-      font-weight: 600;
-      color: var(--gh-link);
-      text-decoration: none;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
+      .slot-link {
+        font-weight: 600;
+        color: var(--gh-link);
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
 
-    .slot-link:hover {
-      text-decoration: underline;
-    }
+      .slot-link:hover {
+        text-decoration: underline;
+      }
 
-    /* Monospace commit hash */
-    .slot-mono-link {
-      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--gh-link);
-      text-decoration: none;
-      letter-spacing: 0.03em;
-      flex-shrink: 0;
-    }
+      /* Monospace commit hash */
+      .slot-mono-link {
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--gh-link);
+        text-decoration: none;
+        letter-spacing: 0.03em;
+        flex-shrink: 0;
+      }
 
-    .slot-mono-link:hover {
-      text-decoration: underline;
-    }
+      .slot-mono-link:hover {
+        text-decoration: underline;
+      }
 
-    .slot-lang {
-      font-weight: 600;
-      color: var(--gh-text);
-      background: color-mix(in srgb, var(--gh-accent) 14%, transparent);
-      border-radius: 10px;
-      padding: 1px 8px;
-      font-size: 0.76rem;
-    }
+      .slot-lang {
+        font-weight: 600;
+        color: var(--gh-text);
+        background: color-mix(in srgb, var(--gh-accent) 14%, transparent);
+        border-radius: 10px;
+        padding: 1px 8px;
+        font-size: 0.76rem;
+      }
 
-    /* ---- Icons ---- */
-    ha-icon.icon-header {
-      --mdc-icon-size: 20px;
-      width: 20px;
-      height: 20px;
-      color: var(--gh-text);
-    }
+      /* ---- Activity chart below the table ---- */
+      .entity-activity {
+        padding: 10px 12px 8px;
+        border-top: 1px solid var(--gh-border);
+      }
 
-    ha-icon.icon-sm {
-      --mdc-icon-size: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 15px;
-      height: 15px;
-      flex-shrink: 0;
-      opacity: 0.7;
-      color: var(--state-icon-color, var(--gh-text-sec));
-    }
-  `;
+      .compact .entity-activity {
+        padding: 6px 10px 4px;
+      }
+
+      /* ---- Icons ---- */
+      ha-icon.icon-sm {
+        --mdc-icon-size: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 15px;
+        height: 15px;
+        flex-shrink: 0;
+        opacity: 0.7;
+        color: var(--state-icon-color, var(--gh-text-sec));
+      }
+    `,
+  ];
 }

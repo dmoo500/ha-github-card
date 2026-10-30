@@ -4,6 +4,7 @@ import type {
   GithubEntityAttributes,
   SlotKey,
 } from "../types/index.js";
+import { detectActivityMetric } from "./activity.js";
 
 /**
  * Returns entity_ids that belong to the GitHub integration.
@@ -78,6 +79,9 @@ const KNOWN_SUFFIXES = [
   "latest_tag",
   "latest_commit",
   "last_commit",
+  "latest_issue",
+  "latest_pull_request",
+  "latest_discussion",
 ];
 
 /**
@@ -186,6 +190,7 @@ export function resolveGithubDevice(
       friendly_name: (rawAttrs.friendly_name as string) ?? entityId,
       attributes: rawAttrs as GithubEntityAttributes,
       slot_icons: {},
+      activity_sources: {},
     };
   }
 
@@ -213,11 +218,18 @@ export function resolveGithubDevice(
 
   const combined: GithubEntityAttributes = {};
   const slot_icons: Partial<Record<SlotKey, string>> = {};
+  const activity_sources: GithubEntityData["activity_sources"] = {};
 
   for (const eid of deviceEntityIds) {
     const st = hass.states[eid];
     if (!st) continue;
     const attrs = st.attributes as Record<string, unknown>;
+
+    const activityMetric = detectActivityMetric(
+      hass.entities?.[eid]?.translation_key,
+      eid,
+    );
+    if (activityMetric) activity_sources[activityMetric] = eid;
 
     // Numeric metric via SENSOR_ATTR_MAP
     const metricKey = detectMetricKey(hass, eid);
@@ -331,6 +343,7 @@ export function resolveGithubDevice(
     friendly_name: friendlyName,
     attributes: combined,
     slot_icons,
+    activity_sources,
   };
 }
 

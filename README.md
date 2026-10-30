@@ -20,6 +20,7 @@ A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card that dis
 - Fully configurable stat rows — up to 5 rows with 1–3 columns each
 - Available stats: Stars, Forks, Watchers, Issues, Pull Requests, Last Commit, Latest Release
 - **Conditional color rules** per stat column — color text or background based on threshold
+- **Activity chart** — daily commits, pull requests and issues of the last 7 days, below each repository table or as a standalone card
 - Visual card editor with entity picker, row/column configurator and color rule builder
 - Owner avatar auto-derived from repository name
 - Compact layout option
@@ -99,6 +100,9 @@ rows:
 | `rows`              | `list`    | see below | List of rows, each a list of 1–3 slot keys                    |
 | `icons`             | `map`     | —       | Per-slot icon override (e.g. `stars: mdi:star-outline`)          |
 | `slot_colors`       | `map`     | —       | Per-slot conditional color rules (see below)                     |
+| `show_activity`     | `boolean` | `false` | Show the [activity chart](#activity-chart) below each repository |
+| `activity_range`    | `string`  | `7d`    | Activity chart time range (see [Activity Chart](#activity-chart)) |
+| `activity_metrics`  | `list`    | `[commits, pull_requests, issues]` | Activity chart metrics          |
 
 **Default rows:**
 ```yaml
@@ -157,6 +161,48 @@ slot_colors:
 
 Supported slots for color rules: `stars`, `forks`, `watchers`, `issues`, `pull_requests`
 
+## Activity Chart
+
+The activity chart shows how many new **commits**, **pull requests**, **issues** and (optionally) **discussions** appeared per day. It is derived from the Home Assistant history of the GitHub integration's *Latest commit*, *Latest pull request*, *Latest issue* and *Latest discussion* sensors — no additional sensors or GitHub tokens are needed. The sensors are discovered automatically from the repository device.
+
+It can be used in two ways:
+
+**Below each repository table** of the GitHub Card:
+
+```yaml
+type: custom:ha-github-card
+entities:
+  - sensor.myrepo_stars
+show_activity: true
+activity_range: 7d
+activity_metrics: [commits, pull_requests, issues]
+```
+
+**As a standalone card** per repository (also available in the card picker as *GitHub Activity Card*):
+
+```yaml
+type: custom:ha-github-activity-card
+entity: sensor.myrepo_latest_commit   # any sensor of the repository device
+title: My Repo                        # optional, defaults to the repository name
+show_header: true
+show_header_icon: true
+activity_range: 7d
+activity_metrics: [commits, pull_requests, issues, discussions]
+```
+
+| Option             | Values                                                  | Default                            |
+|--------------------|---------------------------------------------------------|------------------------------------|
+| `activity_range`   | `7d`                                                    | `7d`                               |
+| `activity_metrics` | `commits`, `pull_requests`, `issues`, `discussions`     | `[commits, pull_requests, issues]` |
+
+Bar colors can be themed with `--gh-activity-commits-color`, `--gh-activity-pull-requests-color`, `--gh-activity-issues-color` and `--gh-activity-discussions-color`.
+
+**Limitations**
+
+- Only activity recorded by Home Assistant is shown. The [recorder](https://www.home-assistant.io/integrations/recorder/) must keep history for the *Latest …* sensors (including attributes) for the whole range — check `purge_keep_days` and excludes.
+- The integration polls GitHub periodically, so several commits/issues created between two updates are counted as one.
+- Closing the newest issue or pull request is not counted as activity.
+
 ## Development
 
 ```bash
@@ -165,6 +211,10 @@ yarn build      # production build
 yarn type-check # TypeScript check
 yarn lint       # ESLint
 ```
+
+### Adding activity time ranges or metrics
+
+Time ranges and metrics are defined in registries in `src/utils/activity.ts`. To add e.g. a 30-day range, extend the `ActivityRangeKey` type in `src/types/index.ts` and add an entry to `ACTIVITY_RANGES` — the editor, the chart and both cards pick it up automatically. Metrics work the same way via `ActivityMetricKey` and `ACTIVITY_METRICS`.
 
 ## License
 
