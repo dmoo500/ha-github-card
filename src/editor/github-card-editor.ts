@@ -30,7 +30,6 @@ export class GithubCardEditor extends LitElement {
   @state() private _pickerValue = "";
 
   setConfig(config: GithubCardConfig): void {
-    console.debug("[ha-github-card] editor.setConfig called", config);
     this._config = { ...config };
     this.requestUpdate();
   }
@@ -52,7 +51,6 @@ export class GithubCardEditor extends LitElement {
       (e as CustomEvent).detail?.value ??
       (e.target as HTMLInputElement)?.value ??
       "";
-    console.debug("[ha-github-card] editor._entityPicked — value:", entityId);
     if (!entityId || !entityId.trim()) {
       this._pickerValue = "";
       return;
@@ -69,7 +67,6 @@ export class GithubCardEditor extends LitElement {
 
   private _addCurrentEntity(): void {
     const val = this._pickerValue.trim();
-    console.debug("[ha-github-card] editor._addCurrentEntity —", val);
     if (!val) return;
     const current = this._config!.entities ?? [];
     if (!current.includes(val)) {
@@ -190,34 +187,12 @@ export class GithubCardEditor extends LitElement {
   // ------------------------------------------------------------------
 
   render() {
-    console.debug(
-      "[ha-github-card] editor.render — hass:",
-      !!this.hass,
-      "| _config:",
-      this._config,
-    );
-    if (!this._config) {
-      console.warn(
-        "[ha-github-card] editor.render — _config is not set yet, rendering nothing",
-      );
-      return nothing;
-    }
+    if (!this._config) return nothing;
 
     const cfg = this._config;
     const selectedEntities = cfg.entities ?? [];
     const rows = this._getRows();
     const githubEntities = this.hass ? getGithubEntities(this.hass) : [];
-    console.debug(
-      "[ha-github-card] editor.render — githubEntities found:",
-      githubEntities.length,
-      githubEntities,
-    );
-    console.debug(
-      "[ha-github-card] editor — ha-textfield defined:",
-      !!customElements.get("ha-textfield"),
-      "| ha-entity-picker defined:",
-      !!customElements.get("ha-entity-picker"),
-    );
 
     return html`
       <div class="field-group">

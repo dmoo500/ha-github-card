@@ -151,14 +151,6 @@ export function resolveGithubDevice(
     console.warn(
       `[ha-github-card] resolveGithubDevice — entity '${entityId}' not found in hass.states`,
     );
-    console.debug(
-      "[ha-github-card] resolveGithubDevice — available states count:",
-      Object.keys(hass.states).length,
-    );
-    console.debug(
-      "[ha-github-card] resolveGithubDevice — hass.entities entry:",
-      hass.entities?.[entityId],
-    );
 
     // Fuzzy match: handle legacy repo-path format like 'owner/repo'
     if (entityId.includes("/")) {
@@ -171,10 +163,6 @@ export function resolveGithubDevice(
         const lower = id.toLowerCase();
         return lower.includes(ownerPart) && lower.includes(repoPart);
       });
-      console.debug(
-        `[ha-github-card] resolveGithubDevice — fuzzy match for '${entityId}':`,
-        candidates,
-      );
       if (candidates.length > 0) {
         console.info(
           `[ha-github-card] resolveGithubDevice — remapped '${entityId}' → '${candidates[0]}'`,
@@ -186,10 +174,6 @@ export function resolveGithubDevice(
   }
 
   const rawAttrs = hass.states[entityId].attributes as Record<string, unknown>;
-  console.debug(
-    `[ha-github-card] resolveGithubDevice — found '${entityId}' in hass.states, state='${hass.states[entityId].state}', attrs:`,
-    rawAttrs,
-  );
 
   // Old-style: rich attributes on single entity
   if (
@@ -208,12 +192,6 @@ export function resolveGithubDevice(
   // New-style: aggregate individual sensor entities by device
   const regEntry = hass.entities?.[entityId];
   const deviceId = regEntry?.device_id ?? null;
-  console.debug(
-    `[ha-github-card] resolveGithubDevice — new-style path. regEntry:`,
-    regEntry,
-    "| deviceId:",
-    deviceId,
-  );
 
   const deviceEntityIds: string[] =
     deviceId && hass.entities
@@ -224,9 +202,6 @@ export function resolveGithubDevice(
       : (() => {
           // Fallback: pattern-based sibling discovery via shared entity_id prefix
           const prefix = extractDevicePrefix(entityId);
-          console.debug(
-            `[ha-github-card] resolveGithubDevice — no device registry, using prefix fallback: '${prefix}'`,
-          );
           if (prefix) {
             const siblings = Object.keys(hass.states).filter((id) =>
               id.toLowerCase().startsWith(prefix.toLowerCase()),
@@ -235,10 +210,6 @@ export function resolveGithubDevice(
           }
           return [entityId];
         })();
-  console.debug(
-    `[ha-github-card] resolveGithubDevice — sibling entity IDs:`,
-    deviceEntityIds,
-  );
 
   const combined: GithubEntityAttributes = {};
   const slot_icons: Partial<Record<SlotKey, string>> = {};
@@ -254,20 +225,12 @@ export function resolveGithubDevice(
       const attrField = SENSOR_ATTR_MAP[metricKey];
       const numVal = parseFloat(st.state);
       const value = isNaN(numVal) ? undefined : numVal;
-      console.debug(
-        `[ha-github-card]   ${eid} → metricKey='${metricKey}' → attr='${attrField}' state='${st.state}' value=${value}`,
-      );
       if (value !== undefined) {
         (combined as Record<string, unknown>)[attrField] = value;
       }
       // collect HA icon for this slot
       const slotKey = METRIC_TO_SLOT[metricKey];
       if (slotKey && attrs.icon) slot_icons[slotKey] = attrs.icon as string;
-    } else {
-      console.debug(
-        `[ha-github-card]   ${eid} → metricKey=${metricKey ?? "null"} (no SENSOR_ATTR_MAP match) state='${st.state}' attrs:`,
-        Object.keys(attrs),
-      );
     }
 
     // Commit sensor: translation_key='latest_commit', entity may have state=message and SHA in attrs
@@ -323,15 +286,6 @@ export function resolveGithubDevice(
         combined.owner_login = owner.login as string;
     }
   }
-
-  console.debug(
-    "[ha-github-card] resolveGithubDevice — combined attrs:",
-    JSON.stringify(combined),
-  );
-  console.debug(
-    "[ha-github-card] resolveGithubDevice — slot_icons:",
-    slot_icons,
-  );
 
   // Friendly name: prefer device registry name, then strip metric suffix from entity
   let friendlyName: string;

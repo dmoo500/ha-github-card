@@ -100,29 +100,9 @@ export class GithubCard extends LitElement {
     if (!this._config || !this.hass) return nothing;
 
     const configuredIds = this._config.entities ?? [];
-    console.debug(
-      "[ha-github-card] card.render — configured entity IDs:",
-      configuredIds,
-    );
-    console.debug(
-      "[ha-github-card] card.render — hass.states keys (sample):",
-      Object.keys(this.hass.states).slice(0, 20),
-    );
     const entities: GithubEntityData[] = configuredIds
-      .map((id) => {
-        const resolved = resolveGithubDevice(this.hass, id);
-        console.debug(
-          `[ha-github-card] card.render — resolveGithubDevice('${id}') =>`,
-          resolved,
-        );
-        return resolved;
-      })
+      .map((id) => resolveGithubDevice(this.hass, id))
       .filter((e): e is GithubEntityData => e !== null);
-    console.debug(
-      "[ha-github-card] card.render — resolved entities:",
-      entities.length,
-      entities.map((e) => e.entity_id),
-    );
 
     return html`
       <ha-card>
@@ -174,18 +154,16 @@ export class GithubCard extends LitElement {
         <!-- Row 1: name (fixed left) + version (fixed right) -->
         <div class="entity-header">
           <div class="header-name">
-            ${
-              this._config.show_avatar && a.owner_avatar
-                ? html`<img
-                    class="avatar"
-                    src="${a.owner_avatar}"
-                    alt="${a.owner_login ?? ""}"
-                    @error="${(e: Event) => {
-                      (e.target as any).style.display = "none";
-                    }}"
-                  />`
-                : nothing
-            }
+            ${this._config.show_avatar && a.owner_avatar
+              ? html`<img
+                  class="avatar"
+                  src="${a.owner_avatar}"
+                  alt="${a.owner_login ?? ""}"
+                  @error="${(e: Event) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}"
+                />`
+              : nothing}
             <a
               class="repo-name"
               href="${a.html_url ?? "#"}"
@@ -218,8 +196,13 @@ export class GithubCard extends LitElement {
                   style="grid-template-columns: repeat(${row.length}, 1fr)"
                 >
                   ${row.map((s) => {
-                    const bg = this._slotBgStyle(s, entity);
-                    const tc = this._slotTextColor(s, entity);
+                    const rule = this._matchSlotRule(s, entity);
+                    const bg =
+                      rule?.type === "background"
+                        ? `background-color: ${rule.color}; border-radius: 4px; padding: 0 4px;`
+                        : "";
+                    const tc =
+                      rule && rule.type !== "background" ? rule.color : "";
                     return html`
                       <div class="slot-cell" style="${bg}">
                         ${this._renderSlot(s, entity, tc)}
@@ -236,12 +219,6 @@ export class GithubCard extends LitElement {
 
   private _matchSlotRule(key: SlotKey, entity: GithubEntityData) {
     const rules = this._config.slot_colors?.[key];
-    console.debug(
-      `[ha-github-card] _matchSlotRule key=${key} slot_colors=`,
-      JSON.stringify(this._config.slot_colors),
-      `rules=`,
-      JSON.stringify(rules),
-    );
     if (!rules?.length) return null;
     const a = entity.attributes;
     const numericValue: Record<string, number | undefined> = {
@@ -252,10 +229,6 @@ export class GithubCard extends LitElement {
       pull_requests: a.open_pull_requests_count,
     };
     const val = numericValue[key];
-    console.debug(
-      `[ha-github-card] _matchSlotRule key=${key} val=${val} rules=`,
-      JSON.stringify(rules),
-    );
     if (val === undefined) return null;
     for (const rule of rules) {
       const ruleValue = Number(rule.value);
@@ -269,25 +242,9 @@ export class GithubCard extends LitElement {
               : rule.op === "<="
                 ? val <= ruleValue
                 : val === ruleValue;
-      console.debug(
-        `[ha-github-card]   rule: ${val} ${rule.op} ${ruleValue} → ${match} (type=${rule.type} color=${rule.color})`,
-      );
       if (match) return rule;
     }
     return null;
-  }
-
-  private _slotBgStyle(key: SlotKey, entity: GithubEntityData): string {
-    const rule = this._matchSlotRule(key, entity);
-    if (rule?.type === "background")
-      return `background-color: ${rule.color}; border-radius: 4px; padding: 0 4px;`;
-    return "";
-  }
-
-  private _slotTextColor(key: SlotKey, entity: GithubEntityData): string {
-    const rule = this._matchSlotRule(key, entity);
-    if (!rule || rule.type === "background") return "";
-    return rule.color;
   }
 
   private _slotIcon(key: SlotKey, entity: GithubEntityData) {
