@@ -246,10 +246,8 @@ export class GithubActivityChart extends LitElement {
       <div class="axis" style="${this._columnsStyle()}">
         ${this._days.map(
           (day, i) => html`
-            <span class="day-label">
-              ${
-                (lastIdx - i) % labelStep === 0 ? this._formatDay(day.date) : ""
-              }
+            <span class="day-label ${day.inProgress ? "in-progress" : ""}">
+              ${(lastIdx - i) % labelStep === 0 ? this._axisLabel(day) : ""}
             </span>
           `,
         )}
@@ -263,7 +261,10 @@ export class GithubActivityChart extends LitElement {
       <div class="bars" style="${this._columnsStyle()}">
         ${this._days.map(
           (day) => html`
-            <div class="bar" title="${this._dayTooltip(day, metrics)}">
+            <div
+              class="bar ${day.inProgress ? "in-progress" : ""}"
+              title="${this._dayTooltip(day, metrics)}"
+            >
               ${metrics.map((m) =>
                 day.counts[m] > 0
                   ? html`<div
@@ -295,6 +296,26 @@ export class GithubActivityChart extends LitElement {
       (max > 0 ? (value / max) * (100 - 2 * LINE_PLOT_PADDING) : 0);
     // Draw the first metric last so it stays on top when lines overlap
     const drawOrder = [...metrics].reverse();
+    // Completed days are drawn solid; the stretch into in-progress days is dashed
+    const firstOpen = this._days.findIndex((d) => d.inProgress);
+    const solidEnd = firstOpen === -1 ? count : firstOpen;
+    const polyline = (
+      m: ActivityMetricKey,
+      from: number,
+      to: number,
+      dashed: boolean,
+    ) => {
+      if (to - from < 2) return nothing;
+      const points = this._days
+        .slice(from, to)
+        .map((d, i) => `${x(from + i)},${y(d.counts[m])}`)
+        .join(" ");
+      return svg`<polyline
+        class="series ${dashed ? "in-progress" : ""}"
+        stroke="${ACTIVITY_METRICS[m].color}"
+        points="${points}"
+      />`;
+    };
 
     return html`
       <svg
@@ -311,13 +332,12 @@ export class GithubActivityChart extends LitElement {
         }
         ${drawOrder.map(
           (m) => svg`
-            <polyline
-              class="series"
-              stroke="${ACTIVITY_METRICS[m].color}"
-              points="${this._days
-                .map((d, i) => `${x(i)},${y(d.counts[m])}`)
-                .join(" ")}"
-            />
+            ${polyline(m, 0, solidEnd, false)}
+            ${
+              firstOpen === -1
+                ? nothing
+                : polyline(m, Math.max(0, firstOpen - 1), count, true)
+            }
           `,
         )}
       </svg>
@@ -325,10 +345,10 @@ export class GithubActivityChart extends LitElement {
         this._days.map((d, i) =>
           d.counts[m] > 0
             ? html`<span
-                class="point"
+                class="point ${d.inProgress ? "in-progress" : ""}"
                 style="left:${x(i)}%;top:${y(
                   d.counts[m],
-                )}%;background:${ACTIVITY_METRICS[m].color}"
+                )}%;--point-color:${ACTIVITY_METRICS[m].color}"
               ></span>`
             : nothing,
         ),
@@ -357,8 +377,28 @@ export class GithubActivityChart extends LitElement {
       : date.toLocaleDateString(locale, { day: "numeric", month: "numeric" });
   }
 
+  /** Localized "Today" (e.g. "Heute"), via the browser's Intl data. */
+  private _todayLabel(): string {
+    const locale = this.hass?.language;
+    const label = new Intl.RelativeTimeFormat(locale, {
+      numeric: "auto",
+    }).format(0, "day");
+    return label.charAt(0).toLocaleUpperCase(locale) + label.slice(1);
+  }
+
+  private _axisLabel(day: ActivityDay): string {
+    return day.inProgress ? this._todayLabel() : this._formatDay(day.date);
+  }
+
+  private _dayName(day: ActivityDay, options: Intl.DateTimeFormatOptions) {
+    const date = day.date.toLocaleDateString(this.hass?.language, options);
+    return day.inProgress
+      ? `${date} (${this._todayLabel()}, in progress)`
+      : date;
+  }
+
   private _dayTooltip(day: ActivityDay, metrics: ActivityMetricKey[]): string {
-    const date = day.date.toLocaleDateString(this.hass?.language, {
+    const date = this._dayName(day, {
       weekday: "short",
       day: "numeric",
       month: "short",
@@ -379,7 +419,6 @@ export class GithubActivityChart extends LitElement {
 
   /** Visually hidden per-day table for screen readers (the chart is role="img"). */
   private _renderDataTable(metrics: ActivityMetricKey[]) {
-    const locale = this.hass?.language;
     return html`
       <table class="visually-hidden">
         <caption>
@@ -398,7 +437,7 @@ export class GithubActivityChart extends LitElement {
             (day) => html`
               <tr>
                 <th scope="row">
-                  ${day.date.toLocaleDateString(locale, {
+                  ${this._dayName(day, {
                     weekday: "long",
                     day: "numeric",
                     month: "long",
@@ -521,6 +560,10 @@ export class GithubActivityChart extends LitElement {
       flex-shrink: 0;
     }
 
+    .bar.in-progress .segment {
+      opacity: 0.5;
+    }
+
     .lines {
       position: absolute;
       inset: 0;
@@ -548,14 +591,25 @@ export class GithubActivityChart extends LitElement {
       vector-effect: non-scaling-stroke;
     }
 
+    .series.in-progress {
+      stroke-dasharray: 4 4;
+    }
+
     .point {
       position: absolute;
       width: 6px;
       height: 6px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
+      background: var(--point-color);
       box-shadow: 0 0 0 1.5px var(--card-background-color, #fff);
       pointer-events: none;
+    }
+
+    .point.in-progress {
+      box-sizing: border-box;
+      background: var(--card-background-color, #fff);
+      border: 2px solid var(--point-color);
     }
 
     .y-max {
@@ -592,6 +646,10 @@ export class GithubActivityChart extends LitElement {
       white-space: nowrap;
       overflow: hidden;
       min-height: 1em;
+    }
+
+    .day-label.in-progress {
+      font-style: italic;
     }
 
     .chart-empty {

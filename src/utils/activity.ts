@@ -207,6 +207,8 @@ export interface ActivityDay {
   date: Date;
   counts: Record<ActivityMetricKey, number>;
   total: number;
+  /** The day has not ended yet, so its counts can still grow. */
+  inProgress: boolean;
 }
 
 /**
@@ -338,12 +340,14 @@ export function computeDailyActivity(
   range: ActivityRangeKey,
   now: Date,
 ): ActivityDay[] {
+  const todayMs = startOfLocalDay(now).getTime();
   const days = getActivityDays(range, now).map<ActivityDay>((date) => ({
     date,
     counts: Object.fromEntries(
       ACTIVITY_METRIC_KEYS.map((key) => [key, 0]),
     ) as Record<ActivityMetricKey, number>,
     total: 0,
+    inProgress: date.getTime() >= todayMs,
   }));
   const indexByDay = new Map(days.map((day, i) => [localDateKey(day.date), i]));
 

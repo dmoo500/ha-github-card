@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- Activity chart: today is marked as in progress (localized *Today* axis label, dashed line segment with hollow points, faded bar, hint in tooltip and screen reader table)
+
+### Fixed
+
+- Activity chart: retry after failed history loads, refresh at midnight, keep live updates until the recorder has them, robust baseline for `unknown`/`unavailable` sensors, no stale cached history responses
+- Activity chart: accessible per-day data table for screen readers
+- Card header uses the `--gh-text` / `--gh-border` theme variables again
+
 ## [0.1.0-beta.1] - 2026-10-30
 
 Pre-release for the upcoming 0.1.0 release.

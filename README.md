@@ -188,6 +188,8 @@ The activity chart shows how many new **commits**, **pull requests**, **issues**
 
 It is available as a **line chart** (default, one line per metric) or as **stacked bars**. Hovering a day shows its exact counts, and the legend shows the totals for the period.
 
+The last day is **today** and updates live. Because it is still in progress, it is marked: the axis shows *Today* (localized), the line towards it is dashed with hollow points, and its bar is drawn faded.
+
 ### Below each repository (GitHub Card)
 
 Enable it in the *Activity Chart* section of the GitHub Card editor, or via YAML:

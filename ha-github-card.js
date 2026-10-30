@@ -680,21 +680,22 @@ function Je(e, t) {
 	return n;
 }
 function Ye(e, t, n, r, i) {
-	let a = Ve(r, i).map((e) => ({
+	let a = ze(i).getTime(), o = Ve(r, i).map((e) => ({
 		date: e,
 		counts: Object.fromEntries(B.map((e) => [e, 0])),
-		total: 0
-	})), o = new Map(a.map((e, t) => [U(e.date), t]));
+		total: 0,
+		inProgress: e.getTime() >= a
+	})), s = new Map(o.map((e, t) => [U(e.date), t]));
 	for (let r of n) {
 		let n = t[r];
 		if (!n) continue;
-		let i = We(e[n] ?? [], z[r], a[0].date.getTime());
+		let i = We(e[n] ?? [], z[r], o[0].date.getTime());
 		for (let e of i) {
-			let t = o.get(U(new Date(e)));
-			t !== void 0 && (a[t].counts[r] += 1, a[t].total += 1);
+			let t = s.get(U(new Date(e)));
+			t !== void 0 && (o[t].counts[r] += 1, o[t].total += 1);
 		}
 	}
-	return a;
+	return o;
 }
 var W = /* @__PURE__ */ new Map();
 function Xe(e, t, n, r) {
@@ -724,14 +725,14 @@ function Ze(e, t, n, r) {
 	return W.set(i, c), c;
 }
 // src/utils/github.ts
-function Qe(e) {
+function G(e) {
 	if (e.entities) {
 		let t = Object.values(e.entities).filter((e) => e.platform === "github").map((e) => e.entity_id).filter((t) => t in e.states);
 		if (t.length > 0) return t;
 	}
 	return Object.keys(e.states).filter((e) => e.startsWith("github."));
 }
-var $e = {
+var Qe = {
 	stargazers_count: "stars",
 	subscribers_count: "watchers",
 	forks_count: "forks",
@@ -749,7 +750,7 @@ var $e = {
 	pull_requests: "pull_requests",
 	open_pull_requests: "pull_requests",
 	stars: "stars"
-}, et = {
+}, $e = {
 	forks: "forks_count",
 	watchers: "watchers_count",
 	issues: "open_issues_count",
@@ -758,7 +759,7 @@ var $e = {
 	open_pull_requests: "open_pull_requests_count",
 	stars: "stargazers_count",
 	stargazers: "stargazers_count"
-}, tt = [
+}, et = [
 	"stargazers_count",
 	"forks_count",
 	"watchers_count",
@@ -773,12 +774,12 @@ var $e = {
 	"latest_pull_request",
 	"latest_discussion"
 ];
-function nt(e) {
+function tt(e) {
 	let t = e.toLowerCase();
-	for (let n of tt) if (t.endsWith(`_${n}`)) return e.slice(0, e.length - n.length - 1) + "_";
+	for (let n of et) if (t.endsWith(`_${n}`)) return e.slice(0, e.length - n.length - 1) + "_";
 	return null;
 }
-var G = {
+var K = {
 	stargazers_count: "stargazers_count",
 	subscribers_count: "watchers_count",
 	forks_count: "forks_count",
@@ -788,26 +789,26 @@ var G = {
 	open_pull_requests_count: "open_pull_requests_count",
 	watchers_count: "watchers_count"
 };
-function rt(e, t) {
+function nt(e, t) {
 	if (e.entities) {
 		let n = e.entities[t];
 		if (n?.translation_key) return n.translation_key;
 		let r = (n?.unique_id ?? "").toLowerCase();
-		for (let e of Object.keys(G)) if (r.endsWith(`_${e}`) || r === e) return e;
+		for (let e of Object.keys(K)) if (r.endsWith(`_${e}`) || r === e) return e;
 	}
 	let n = t.toLowerCase();
-	for (let e of Object.keys(G)) if (n.endsWith(`_${e}`)) return e;
-	for (let [e, t] of Object.entries(et)) if (n.endsWith(`_${e}`)) return t;
+	for (let e of Object.keys(K)) if (n.endsWith(`_${e}`)) return e;
+	for (let [e, t] of Object.entries($e)) if (n.endsWith(`_${e}`)) return t;
 	return null;
 }
-function it(e, t) {
+function rt(e, t) {
 	if (!e.states[t]) {
 		if (console.warn(`[ha-github-card] resolveGithubDevice — entity '${t}' not found in hass.states`), t.includes("/")) {
 			let [n, r] = t.split("/", 2), i = (e) => e.toLowerCase().replace(/[^a-z0-9]/g, "_"), a = i(n), o = i(r), s = Object.keys(e.states).filter((e) => {
 				let t = e.toLowerCase();
 				return t.includes(a) && t.includes(o);
 			});
-			if (s.length > 0) return console.info(`[ha-github-card] resolveGithubDevice — remapped '${t}' → '${s[0]}'`), it(e, s[0]);
+			if (s.length > 0) return console.info(`[ha-github-card] resolveGithubDevice — remapped '${t}' → '${s[0]}'`), rt(e, s[0]);
 		}
 		return null;
 	}
@@ -821,7 +822,7 @@ function it(e, t) {
 		activity_sources: {}
 	};
 	let r = e.entities?.[t]?.device_id ?? null, i = r && e.entities ? Object.values(e.entities).filter((e) => e.device_id === r).map((e) => e.entity_id).filter((t) => t in e.states) : (() => {
-		let n = nt(t);
+		let n = tt(t);
 		if (n) {
 			let t = Object.keys(e.states).filter((e) => e.toLowerCase().startsWith(n.toLowerCase()));
 			if (t.length > 1) return t;
@@ -833,11 +834,11 @@ function it(e, t) {
 		if (!n) continue;
 		let r = n.attributes, i = Re(e.entities?.[t]?.translation_key, t);
 		i && (s[i] = t);
-		let c = rt(e, t);
-		if (c && c in G) {
-			let e = G[c], t = parseFloat(n.state), i = isNaN(t) ? void 0 : t;
+		let c = nt(e, t);
+		if (c && c in K) {
+			let e = K[c], t = parseFloat(n.state), i = isNaN(t) ? void 0 : t;
 			i !== void 0 && (a[e] = i);
-			let s = $e[c];
+			let s = Qe[c];
 			s && r.icon && (o[s] = r.icon);
 		}
 		if ((t.toLowerCase().includes("commit") || c === "latest_commit") && (r.sha && (a.latest_commit_sha = r.sha), r.url && (a.latest_commit_url = r.url), r.authored_at && (a.latest_commit_authored_at = r.authored_at), r.message && (a.latest_commit_message = r.message), !a.latest_commit_sha && n.state && n.state !== "unavailable" && (a.latest_commit_sha = n.state), r.icon && (o.last_commit = r.icon)), (t.toLowerCase().includes("release") || t.toLowerCase().includes("_tag") || c === "latest_tag") && (r.tag && (a.latest_release_tag = r.tag), !a.latest_release_tag && n.state && n.state !== "unavailable" && n.state !== "unknown" && (a.latest_release_tag = n.state)), r.html_url) {
@@ -867,7 +868,7 @@ function it(e, t) {
 		activity_sources: s
 	};
 }
-function at(e) {
+function it(e) {
 	if (!e) return "—";
 	try {
 		return new Date(e).toLocaleDateString(void 0, {
@@ -879,11 +880,11 @@ function at(e) {
 		return e;
 	}
 }
-function K(e) {
+function q(e) {
 	return e == null ? "—" : e >= 1e6 ? `${(e / 1e6).toFixed(1)}M` : e >= 1e3 ? `${(e / 1e3).toFixed(1)}k` : String(e);
 }
 // src/components/card-header.ts
-function ot(e) {
+function at(e) {
 	return e.show_header === !1 || !e.title ? k : D`
     <div class="card-header">
       ${e.show_header_icon === !1 ? k : D`<div class="header-icon">
@@ -893,7 +894,7 @@ function ot(e) {
     </div>
   `;
 }
-var st = o`
+var ot = o`
   .card-header {
     display: flex;
     align-items: center;
@@ -925,22 +926,22 @@ var st = o`
   }
 `;
 // \0@oxc-project+runtime@0.156.0/helpers/esm/decorateMetadata.js
-function q(e, t) {
+function J(e, t) {
 	if (typeof Reflect == "object" && typeof Reflect.metadata == "function") return Reflect.metadata(e, t);
 }
 // \0@oxc-project+runtime@0.156.0/helpers/esm/decorate.js
-function J(e, t, n, r) {
+function Y(e, t, n, r) {
 	var i = arguments.length, a = i < 3 ? t : r === null ? r = Object.getOwnPropertyDescriptor(t, n) : r, o;
 	if (typeof Reflect == "object" && typeof Reflect.decorate == "function") a = Reflect.decorate(e, t, n, r);
 	else for (var s = e.length - 1; s >= 0; s--) (o = e[s]) && (a = (i < 3 ? o(a) : i > 3 ? o(t, n, a) : o(t, n)) || a);
 	return i > 3 && a && Object.defineProperty(t, n, a), a;
 }
 // src/github-card.ts
-var Y = [[
+var X = [[
 	"watchers",
 	"stars",
 	"last_commit"
-], ["pull_requests", "issues"]], ct = {
+], ["pull_requests", "issues"]], st = {
 	stars: "mdi:star",
 	forks: "mdi:source-fork",
 	watchers: "mdi:eye",
@@ -948,7 +949,7 @@ var Y = [[
 	pull_requests: "mdi:source-pull",
 	last_commit: "mdi:source-commit",
 	last_release: "mdi:tag"
-}, X = class e extends I {
+}, ct = class e extends I {
 	get hass() {
 		return this._hass;
 	}
@@ -977,11 +978,11 @@ var Y = [[
 	setConfig(t) {
 		if (!t.entities || !Array.isArray(t.entities)) throw Error("ha-github-card: \"entities\" must be an array");
 		let n = t.entities.filter((e) => typeof e == "string" && e.trim() !== ""), r = t.rows;
-		!r?.length && (t.row2_slots || t.row3_slots) && (r = [t.row2_slots ?? Y[0], t.row3_slots ?? Y[1]]), this._config = {
+		!r?.length && (t.row2_slots || t.row3_slots) && (r = [t.row2_slots ?? X[0], t.row3_slots ?? X[1]]), this._config = {
 			...e.getStubConfig(),
 			...t,
 			entities: n,
-			rows: r ?? Y
+			rows: r ?? X
 		};
 	}
 	getCardSize() {
@@ -990,10 +991,10 @@ var Y = [[
 	}
 	render() {
 		if (!this._config || !this.hass) return k;
-		let e = (this._config.entities ?? []).map((e) => it(this.hass, e)).filter((e) => e !== null);
+		let e = (this._config.entities ?? []).map((e) => rt(this.hass, e)).filter((e) => e !== null);
 		return D`
       <ha-card>
-        ${ot(this._config)}
+        ${at(this._config)}
         <div class="card-content ${this._config.compact ? "compact" : ""}">
           ${e.length === 0 ? D`<div class="empty">No GitHub entities configured.</div>` : e.map((e) => this._renderEntity(e))}
         </div>
@@ -1001,7 +1002,7 @@ var Y = [[
     `;
 	}
 	_getRows() {
-		return this._config.rows?.length ? this._config.rows : [this._config.row2_slots ?? Y[0], this._config.row3_slots ?? Y[1]];
+		return this._config.rows?.length ? this._config.rows : [this._config.row2_slots ?? X[0], this._config.row3_slots ?? X[1]];
 	}
 	_renderEntity(e) {
 		let t = e.attributes, n = this._getRows();
@@ -1081,7 +1082,7 @@ var Y = [[
 	}
 	_slotIcon(e, t) {
 		let n = this._config.icons?.[e], r = t.slot_icons[e];
-		return D`<ha-icon class="icon-sm" .icon="${n ?? r ?? ct[e] ?? "mdi:help-circle-outline"}"></ha-icon>`;
+		return D`<ha-icon class="icon-sm" .icon="${n ?? r ?? st[e] ?? "mdi:help-circle-outline"}"></ha-icon>`;
 	}
 	_renderSlot(e, t, n = "") {
 		let r = t.attributes, i = n ? `color: ${n};` : "";
@@ -1089,35 +1090,35 @@ var Y = [[
 			case "stars": return D`
           ${this._slotIcon(e, t)}
           <span class="slot-value" style="${i}"
-            >${K(r.stargazers_count)}</span
+            >${q(r.stargazers_count)}</span
           >
           <span class="slot-label" style="${i}">Stars</span>
         `;
 			case "forks": return D`
           ${this._slotIcon(e, t)}
           <span class="slot-value" style="${i}"
-            >${K(r.forks_count)}</span
+            >${q(r.forks_count)}</span
           >
           <span class="slot-label" style="${i}">Forks</span>
         `;
 			case "watchers": return D`
           ${this._slotIcon(e, t)}
           <span class="slot-value" style="${i}"
-            >${K(r.watchers_count)}</span
+            >${q(r.watchers_count)}</span
           >
           <span class="slot-label" style="${i}">Watchers</span>
         `;
 			case "issues": return D`
           ${this._slotIcon(e, t)}
           <span class="slot-value" style="${i}"
-            >${K(r.open_issues_count)}</span
+            >${q(r.open_issues_count)}</span
           >
           <span class="slot-label" style="${i}">Issues</span>
         `;
 			case "pull_requests": return D`
           ${this._slotIcon(e, t)}
           <span class="slot-value" style="${i}"
-            >${K(r.open_pull_requests_count)}</span
+            >${q(r.open_pull_requests_count)}</span
           >
           <span class="slot-label" style="${i}">Pull Requests</span>
         `;
@@ -1132,7 +1133,7 @@ var Y = [[
                 >${r.latest_commit_sha.slice(0, 7)}</a
               >
               <span class="slot-label"
-                >${at(r.latest_commit_authored_at)}</span
+                >${it(r.latest_commit_authored_at)}</span
               >
             ` : D`${this._slotIcon(e, t)}<span class="slot-value"
                 >—</span
@@ -1151,7 +1152,7 @@ var Y = [[
 		}
 	}
 	static {
-		this.styles = [st, o`
+		this.styles = [ot, o`
       :host {
         --gh-accent: var(--primary-color, #0366d6);
         --gh-text: var(--primary-text-color, #24292e);
@@ -1359,7 +1360,7 @@ var Y = [[
     `];
 	}
 };
-J([R(), q("design:type", Object)], X.prototype, "_config", void 0);
+Y([R(), J("design:type", Object)], ct.prototype, "_config", void 0);
 // src/editor/editor-styles.ts
 var lt = o`
   :host {
@@ -1645,7 +1646,7 @@ var dt = o`
 	}
 	render() {
 		if (!this._config) return k;
-		let e = this._config, t = e.entities ?? [], n = this._getRows(), r = this.hass ? Qe(this.hass) : [];
+		let e = this._config, t = e.entities ?? [], n = this._getRows(), r = this.hass ? G(this.hass) : [];
 		return D`
       <div class="field-group">
         <label class="field-label" for="card-title">Card Title</label>
@@ -2224,7 +2225,7 @@ var dt = o`
 		];
 	}
 };
-J([L({ attribute: !1 }), q("design:type", Object)], Z.prototype, "hass", void 0), J([R(), q("design:type", Object)], Z.prototype, "_config", void 0), J([R(), q("design:type", Object)], Z.prototype, "_pickerValue", void 0);
+Y([L({ attribute: !1 }), J("design:type", Object)], Z.prototype, "hass", void 0), Y([R(), J("design:type", Object)], Z.prototype, "_config", void 0), Y([R(), J("design:type", Object)], Z.prototype, "_pickerValue", void 0);
 // src/github-activity-card.ts
 var pt = class extends I {
 	get hass() {
@@ -2239,7 +2240,7 @@ var pt = class extends I {
 	static getStubConfig(e) {
 		return {
 			type: "custom:ha-github-activity-card",
-			entity: e ? Qe(e)[0] ?? "" : "",
+			entity: e ? G(e)[0] ?? "" : "",
 			show_header: !0,
 			show_header_icon: !0,
 			activity_range: "7d",
@@ -2258,10 +2259,10 @@ var pt = class extends I {
 	}
 	render() {
 		if (!this._config || !this.hass) return k;
-		let e = this._config.entity ? it(this.hass, this._config.entity) : null, t = this._config.title || e?.attributes.full_name || e?.friendly_name || "GitHub Activity";
+		let e = this._config.entity ? rt(this.hass, this._config.entity) : null, t = this._config.title || e?.attributes.full_name || e?.friendly_name || "GitHub Activity";
 		return D`
       <ha-card>
-        ${ot({
+        ${at({
 			...this._config,
 			title: t
 		})}
@@ -2278,7 +2279,7 @@ var pt = class extends I {
     `;
 	}
 	static {
-		this.styles = [st, o`
+		this.styles = [ot, o`
       ha-card {
         overflow: hidden;
         border-radius: var(--ha-card-border-radius, 12px);
@@ -2297,7 +2298,7 @@ var pt = class extends I {
     `];
 	}
 };
-J([R(), q("design:type", Object)], pt.prototype, "_config", void 0);
+Y([R(), J("design:type", Object)], pt.prototype, "_config", void 0);
 // src/editor/github-activity-card-editor.ts
 var Q = class extends I {
 	setConfig(e) {
@@ -2317,7 +2318,7 @@ var Q = class extends I {
 	}
 	render() {
 		if (!this._config) return k;
-		let e = this._config, t = this.hass ? Qe(this.hass) : [];
+		let e = this._config, t = this.hass ? G(this.hass) : [];
 		return D`
       <div class="field-group">
         <label class="field-label" for="activity-entity">
@@ -2379,7 +2380,7 @@ var Q = class extends I {
 		this.styles = [lt, dt];
 	}
 };
-J([L({ attribute: !1 }), q("design:type", Object)], Q.prototype, "hass", void 0), J([R(), q("design:type", Object)], Q.prototype, "_config", void 0);
+Y([L({ attribute: !1 }), J("design:type", Object)], Q.prototype, "hass", void 0), Y([R(), J("design:type", Object)], Q.prototype, "_config", void 0);
 // src/components/github-activity-chart.ts
 var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
 	constructor(...e) {
@@ -2484,8 +2485,8 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
 		return D`
       <div class="axis" style="${this._columnsStyle()}">
         ${this._days.map((n, r) => D`
-            <span class="day-label">
-              ${(t - r) % e === 0 ? this._formatDay(n.date) : ""}
+            <span class="day-label ${n.inProgress ? "in-progress" : ""}">
+              ${(t - r) % e === 0 ? this._axisLabel(n) : ""}
             </span>
           `)}
       </div>
@@ -2496,7 +2497,10 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
 		return D`
       <div class="bars" style="${this._columnsStyle()}">
         ${this._days.map((n) => D`
-            <div class="bar" title="${this._dayTooltip(n, e)}">
+            <div
+              class="bar ${n.inProgress ? "in-progress" : ""}"
+              title="${this._dayTooltip(n, e)}"
+            >
               ${e.map((e) => n.counts[e] > 0 ? D`<div
                       class="segment"
                       style="height:${n.counts[e] / t * 100}%;background:${z[e].color}"
@@ -2507,7 +2511,15 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
     `;
 	}
 	_renderLine(e) {
-		let t = Math.max(0, ...this._days.flatMap((t) => e.map((e) => t.counts[e]))), n = this._days.length, r = (e) => (e + .5) / n * 100, i = (e) => 92 - (t > 0 ? e / t * 84 : 0), a = [...e].reverse();
+		let t = Math.max(0, ...this._days.flatMap((t) => e.map((e) => t.counts[e]))), n = this._days.length, r = (e) => (e + .5) / n * 100, i = (e) => 92 - (t > 0 ? e / t * 84 : 0), a = [...e].reverse(), o = this._days.findIndex((e) => e.inProgress), s = o === -1 ? n : o, c = (e, t, n, a) => {
+			if (n - t < 2) return k;
+			let o = this._days.slice(t, n).map((n, a) => `${r(t + a)},${i(n.counts[e])}`).join(" ");
+			return ye`<polyline
+        class="series ${a ? "in-progress" : ""}"
+        stroke="${z[e].color}"
+        points="${o}"
+      />`;
+		};
 		return D`
       <svg
         class="lines"
@@ -2518,16 +2530,13 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
         <line class="baseline" x1="0" x2="100" y1="${i(0)}" y2="${i(0)}" />
         ${t > 0 ? ye`<line class="gridline" x1="0" x2="100" y1="${i(t)}" y2="${i(t)}" />` : k}
         ${a.map((e) => ye`
-            <polyline
-              class="series"
-              stroke="${z[e].color}"
-              points="${this._days.map((t, n) => `${r(n)},${i(t.counts[e])}`).join(" ")}"
-            />
+            ${c(e, 0, s, !1)}
+            ${o === -1 ? k : c(e, Math.max(0, o - 1), n, !0)}
           `)}
       </svg>
       ${a.map((e) => this._days.map((t, n) => t.counts[e] > 0 ? D`<span
-                class="point"
-                style="left:${r(n)}%;top:${i(t.counts[e])}%;background:${z[e].color}"
+                class="point ${t.inProgress ? "in-progress" : ""}"
+                style="left:${r(n)}%;top:${i(t.counts[e])}%;--point-color:${z[e].color}"
               ></span>` : k))}
       ${t > 0 ? D`<span class="y-max" style="top:${i(t)}%">${t}</span>` : k}
       <div class="hover-columns" style="${this._columnsStyle()}">
@@ -2545,8 +2554,19 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
 			month: "numeric"
 		});
 	}
+	_todayLabel() {
+		let e = this.hass?.language, t = new Intl.RelativeTimeFormat(e, { numeric: "auto" }).format(0, "day");
+		return t.charAt(0).toLocaleUpperCase(e) + t.slice(1);
+	}
+	_axisLabel(e) {
+		return e.inProgress ? this._todayLabel() : this._formatDay(e.date);
+	}
+	_dayName(e, t) {
+		let n = e.date.toLocaleDateString(this.hass?.language, t);
+		return e.inProgress ? `${n} (${this._todayLabel()}, in progress)` : n;
+	}
 	_dayTooltip(e, t) {
-		return `${e.date.toLocaleDateString(this.hass?.language, {
+		return `${this._dayName(e, {
 			weekday: "short",
 			day: "numeric",
 			month: "short"
@@ -2556,7 +2576,6 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
 		return `Activity: ${e.map((e) => `${this._days.reduce((t, n) => t + n.counts[e], 0)} ${z[e].label}`).join(", ")}`;
 	}
 	_renderDataTable(e) {
-		let t = this.hass?.language;
 		return D`
       <table class="visually-hidden">
         <caption>
@@ -2569,16 +2588,16 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
           </tr>
         </thead>
         <tbody>
-          ${this._days.map((n) => D`
+          ${this._days.map((t) => D`
               <tr>
                 <th scope="row">
-                  ${n.date.toLocaleDateString(t, {
+                  ${this._dayName(t, {
 			weekday: "long",
 			day: "numeric",
 			month: "long"
 		})}
                 </th>
-                ${e.map((e) => D`<td>${n.counts[e]}</td>`)}
+                ${e.map((e) => D`<td>${t.counts[e]}</td>`)}
               </tr>
             `)}
         </tbody>
@@ -2690,6 +2709,10 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
       flex-shrink: 0;
     }
 
+    .bar.in-progress .segment {
+      opacity: 0.5;
+    }
+
     .lines {
       position: absolute;
       inset: 0;
@@ -2717,14 +2740,25 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
       vector-effect: non-scaling-stroke;
     }
 
+    .series.in-progress {
+      stroke-dasharray: 4 4;
+    }
+
     .point {
       position: absolute;
       width: 6px;
       height: 6px;
       border-radius: 50%;
       transform: translate(-50%, -50%);
+      background: var(--point-color);
       box-shadow: 0 0 0 1.5px var(--card-background-color, #fff);
       pointer-events: none;
+    }
+
+    .point.in-progress {
+      box-sizing: border-box;
+      background: var(--card-background-color, #fff);
+      border: 2px solid var(--point-color);
     }
 
     .y-max {
@@ -2763,6 +2797,10 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
       min-height: 1em;
     }
 
+    .day-label.in-progress {
+      font-style: italic;
+    }
+
     .chart-empty {
       position: absolute;
       inset: 0;
@@ -2784,13 +2822,13 @@ var mt = 7, ht = 10, gt = 3e4, $ = class extends I {
   `;
 	}
 };
-J([L({ attribute: !1 }), q("design:type", Object)], $.prototype, "hass", void 0), J([L({ attribute: !1 }), q("design:type", typeof Partial > "u" ? Object : Partial)], $.prototype, "sources", void 0), J([L({ attribute: !1 }), q("design:type", Object)], $.prototype, "options", void 0), J([R(), q("design:type", Array)], $.prototype, "_days", void 0), J([R(), q("design:type", Object)], $.prototype, "_loadState", void 0);
+Y([L({ attribute: !1 }), J("design:type", Object)], $.prototype, "hass", void 0), Y([L({ attribute: !1 }), J("design:type", typeof Partial > "u" ? Object : Partial)], $.prototype, "sources", void 0), Y([L({ attribute: !1 }), J("design:type", Object)], $.prototype, "options", void 0), Y([R(), J("design:type", Array)], $.prototype, "_days", void 0), Y([R(), J("design:type", Object)], $.prototype, "_loadState", void 0);
 // src/index.ts
 var _t = "https://github.com/dmoo500/ha-github-card";
 console.info("%c GITHUB-CARD %c 0.1.0-beta.1 ", "color: white; background: #24292e; font-weight: 700;", "color: #24292e; background: white; font-weight: 700;");
 var vt = [
 	["ha-github-activity-chart", $],
-	["ha-github-card", X],
+	["ha-github-card", ct],
 	["ha-github-card-editor", Z],
 	["ha-github-activity-card", pt],
 	["ha-github-activity-card-editor", Q]
@@ -2809,6 +2847,6 @@ window.customCards ??= [], window.customCards.push({
 	preview: !0,
 	documentationURL: _t
 });
-export { pt as GithubActivityCard, Q as GithubActivityCardEditor, $ as GithubActivityChart, X as GithubCard, Z as GithubCardEditor };
+export { pt as GithubActivityCard, Q as GithubActivityCardEditor, $ as GithubActivityChart, ct as GithubCard, Z as GithubCardEditor };
 
 //# sourceMappingURL=ha-github-card.js.map
