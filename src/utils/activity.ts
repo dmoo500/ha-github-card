@@ -366,14 +366,18 @@ export function computeDailyActivity(
 }
 
 // ------------------------------------------------------------------
-// History fetching (deduplicated across all charts on a dashboard)
+// History fetching (in-flight requests deduplicated across all charts)
 // ------------------------------------------------------------------
 
-const MAX_CACHE_ENTRIES = 50;
-const historyCache = new Map<string, Promise<HistoryResponse>>();
+/**
+ * Only pending requests are shared. Settled responses are not cached because
+ * the recorder may commit further transitions under the same key, which a
+ * freshly created chart could otherwise never observe.
+ */
+const inFlightRequests = new Map<string, Promise<HistoryResponse>>();
 
 /**
- * Cache key changes whenever a source sensor updates or the day rolls over,
+ * Key changes whenever a source sensor updates or the day rolls over,
  * which triggers a refetch exactly when new data can exist.
  */
 export function activityRequestKey(
@@ -395,8 +399,8 @@ export function fetchActivityHistory(
   now: Date,
 ): Promise<HistoryResponse> {
   const key = activityRequestKey(hass, entityIds, range, now);
-  const cached = historyCache.get(key);
-  if (cached) return cached;
+  const pending = inFlightRequests.get(key);
+  if (pending) return pending;
 
   const [windowStart] = getActivityDays(range, now);
   const start = new Date(windowStart);
@@ -412,14 +416,10 @@ export function fetchActivityHistory(
       minimal_response: false,
       no_attributes: false,
     })
-    .catch((err: unknown) => {
-      historyCache.delete(key);
-      throw err;
+    .finally(() => {
+      inFlightRequests.delete(key);
     });
 
-  historyCache.set(key, request);
-  while (historyCache.size > MAX_CACHE_ENTRIES) {
-    historyCache.delete(historyCache.keys().next().value as string);
-  }
+  inFlightRequests.set(key, request);
   return request;
 }
