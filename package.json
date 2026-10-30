@@ -1,15 +1,15 @@
 {
   "name": "ha-github-card",
-  "version": "1.0.0",
+  "version": "0.1.0-beta.1",
   "description": "Home Assistant custom Lovelace card to display GitHub service information",
   "main": "ha-github-card.js",
-  "homepage": "https://github.com/your-username/ha-github-card",
+  "homepage": "https://github.com/dmoo500/ha-github-card",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/your-username/ha-github-card.git"
+    "url": "git+https://github.com/dmoo500/ha-github-card.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/ha-github-card/issues"
+    "url": "https://github.com/dmoo500/ha-github-card/issues"
   },
   "scripts": {
     "build": "vite build",

@@ -6,6 +6,12 @@ import { GithubActivityChart } from "./components/github-activity-chart.js";
 
 const DOCUMENTATION_URL = "https://github.com/dmoo500/ha-github-card";
 
+console.info(
+  `%c GITHUB-CARD %c ${__CARD_VERSION__} `,
+  "color: white; background: #24292e; font-weight: 700;",
+  "color: #24292e; background: white; font-weight: 700;",
+);
+
 const ELEMENTS: [string, typeof HTMLElement][] = [
   ["ha-github-activity-chart", GithubActivityChart],
   ["ha-github-card", GithubCard],

@@ -30,6 +30,8 @@ export default [
         ResizeObserver: 'readonly',
         Response: 'readonly',
         Window: 'readonly',
+        // Injected by vite (see vite.config.js)
+        __CARD_VERSION__: 'readonly',
         // Node globals (for build tools)
         process: 'readonly',
         __dirname: 'readonly',
