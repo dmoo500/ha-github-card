@@ -146,18 +146,35 @@ export function resolveActivityOptions(
   };
 }
 
-/** Detects which activity metric a sensor provides (translation_key first, entity_id suffix as fallback). */
-export function detectActivityMetric(
-  translationKey: string | null | undefined,
-  entityId: string,
-): ActivityMetricKey | null {
-  const eid = entityId.toLowerCase();
-  for (const key of ACTIVITY_METRIC_KEYS) {
-    const def = ACTIVITY_METRICS[key];
-    if (translationKey === def.translationKey) return key;
-  }
-  for (const key of ACTIVITY_METRIC_KEYS) {
-    if (eid.endsWith(`_${ACTIVITY_METRICS[key].translationKey}`)) return key;
+/** Identifiers of a sensor, from the entity registry where available. */
+export interface ActivitySensorIdentity {
+  entityId: string;
+  translationKey?: string | null;
+  uniqueId?: string | null;
+}
+
+/**
+ * Detects which activity metric a sensor provides. Stable registry
+ * identifiers (translation_key, then unique_id) come before the
+ * user-editable entity_id, so renamed sensors are still found.
+ */
+export function detectActivityMetric({
+  entityId,
+  translationKey,
+  uniqueId,
+}: ActivitySensorIdentity): ActivityMetricKey | null {
+  const matchers: ((suffix: string) => boolean)[] = [
+    (suffix) => translationKey === suffix,
+    (suffix) => {
+      const uid = (uniqueId ?? "").toLowerCase();
+      return uid === suffix || uid.endsWith(`_${suffix}`);
+    },
+    (suffix) => entityId.toLowerCase().endsWith(`_${suffix}`),
+  ];
+  for (const matches of matchers) {
+    for (const key of ACTIVITY_METRIC_KEYS) {
+      if (matches(ACTIVITY_METRICS[key].translationKey)) return key;
+    }
   }
   return null;
 }
@@ -315,6 +332,22 @@ export class LiveStateTracker {
 
 function newestTimestamp(entries: HistoryStateEntry[]): number {
   return entries.reduce((max, e) => Math.max(max, e.lu), -Infinity);
+}
+
+/**
+ * True if a sensor's current state is newer than its recorded history, i.e.
+ * the recorder has not committed it yet. Transitions that happened before the
+ * chart was created can then only be recovered by fetching again later.
+ */
+export function historyLagsBehind(
+  history: HistoryResponse,
+  states: Record<string, HassEntity>,
+  entityIds: string[],
+): boolean {
+  return entityIds.some((id) => {
+    const lu = Date.parse(states[id]?.last_updated ?? "") / 1000;
+    return Number.isFinite(lu) && lu > newestTimestamp(history[id] ?? []);
+  });
 }
 
 /** Appends live transitions that are newer than the recorded history. */

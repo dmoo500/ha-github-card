@@ -10,8 +10,9 @@ All notable changes to this project are documented in this file.
 
 ### Fixed
 
-- Activity chart: retry after failed history loads, refresh at midnight, keep live updates until the recorder has them, robust baseline for `unknown`/`unavailable` sensors, no stale cached history responses
+- Activity chart: retry after failed history loads, refresh at midnight, keep live updates until the recorder has them, robust baseline for `unknown`/`unavailable` sensors, no stale cached history responses, refetch history that lags behind the live sensor state
 - Activity chart: accessible per-day data table for screen readers
+- Activity chart: renamed activity sensors are detected via their stable `unique_id`
 - Card header uses the `--gh-text` / `--gh-border` theme variables again
 
 ## [0.1.0-beta.1] - 2026-10-30

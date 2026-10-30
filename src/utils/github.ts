@@ -225,10 +225,12 @@ export function resolveGithubDevice(
     if (!st) continue;
     const attrs = st.attributes as Record<string, unknown>;
 
-    const activityMetric = detectActivityMetric(
-      hass.entities?.[eid]?.translation_key,
-      eid,
-    );
+    const registryEntry = hass.entities?.[eid];
+    const activityMetric = detectActivityMetric({
+      entityId: eid,
+      translationKey: registryEntry?.translation_key,
+      uniqueId: registryEntry?.unique_id,
+    });
     if (activityMetric) activity_sources[activityMetric] = eid;
 
     // Numeric metric via SENSOR_ATTR_MAP
