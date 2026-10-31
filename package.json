@@ -19,9 +19,11 @@
     "lint": "eslint src/**/*.ts --no-warn-ignored",
     "format": "prettier --write src/",
     "format:check": "prettier --check src/",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test",
     "prepare": "yarn build",
-    "release": "yarn type-check && yarn build"
+    "validate": "yarn type-check && yarn lint && yarn format:check && yarn validate:badges",
+    "validate:badges": "node scripts/validate-badges.mjs",
+    "release": "yarn validate && yarn build"
   },
   "keywords": [
     "home-assistant",
