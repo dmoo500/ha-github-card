@@ -1,14 +1,14 @@
 # ha-github-card
 
-[![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
-[![GitHub release](https://img.shields.io/github/v/release/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/releases)
+[![HACS](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://github.com/hacs/integration)
+[![Latest release](https://img.shields.io/github/v/release/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/releases)
 [![License](https://img.shields.io/github/license/dmoo500/ha-github-card)](LICENSE)
-[![GitHub issues](https://img.shields.io/github/issues/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/issues)
+[![Issues](https://img.shields.io/github/issues-raw/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/issues)
 [![GitHub stars](https://img.shields.io/github/stars/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/stargazers)
 [![GitHub watchers](https://img.shields.io/github/watchers/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/watchers)
-[![Last Commit](https://img.shields.io/github/last-commit/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/commits/main)
-[![Maintained](https://img.shields.io/maintenance/yes/2026)](https://github.com/dmoo500/ha-github-card)
-[![TypeScript](https://img.shields.io/badge/TypeScript-6-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![GitHub last commit](https://img.shields.io/github/last-commit/dmoo500/ha-github-card)](https://github.com/dmoo500/ha-github-card/commits/main)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/dmoo500/ha-github-card)
+[![TypeScript](https://img.shields.io/badge/TypeScript-6-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 
 A custom [Home Assistant](https://www.home-assistant.io/) Lovelace card that displays information from your GitHub repositories tracked via the official [GitHub integration](https://www.home-assistant.io/integrations/github/).
 
@@ -275,7 +275,12 @@ yarn dev          # rebuild on change
 yarn type-check   # TypeScript check
 yarn lint         # ESLint
 yarn format       # Prettier (format:check in CI)
+yarn validate     # TypeScript, ESLint, formatting, and README badges
+yarn validate:badges # Check badge links and the TypeScript major version offline
+yarn test         # Regression tests
 ```
+
+CI also checks the README badges. Update the static TypeScript badge when upgrading to a new major version.
 
 ### Adding activity time ranges, metrics or chart types
 
