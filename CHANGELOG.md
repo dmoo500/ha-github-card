@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.1.1] - 2026-11-06
+
+Maintenance release. The cards and their configuration are unchanged; no migration is needed.
+
+### Changed
+
+- Updated dependencies and development tools.
+- Added automated checks to keep the README badges consistent with the repository and TypeScript version.
+
 ## [0.1.0] - 2026-10-30
 
 First release with the activity chart. Includes everything from `0.1.0-beta.1` plus the following changes.
