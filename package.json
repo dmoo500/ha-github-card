@@ -51,7 +51,7 @@
     "eslint-plugin-promise": "^7.3.0",
     "prettier": "^3.9.10",
     "typescript": "^6.0.3",
-    "vite": "^8.3.5"
+    "vite": "^8.3.6"
   },
   "dependencies": {
     "lit": "^3.3.3"
