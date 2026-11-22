@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented in this file.
 
+## [0.1.2] - 2026-11-22
+
+Maintenance release. The cards and their configuration are unchanged; no migration is needed.
+
+### Changed
+
+- Updated dependencies and development tools.
+
 ## [0.1.1] - 2026-11-06
 
 Maintenance release. The cards and their configuration are unchanged; no migration is needed.
