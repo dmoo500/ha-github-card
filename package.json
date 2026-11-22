@@ -1,6 +1,6 @@
 {
   "name": "ha-github-card",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Home Assistant custom Lovelace card to display GitHub service information",
   "main": "ha-github-card.js",
   "homepage": "https://github.com/dmoo500/ha-github-card",
@@ -43,7 +43,7 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@typescript-eslint/eslint-plugin": "^8.72.2",
-    "@typescript-eslint/parser": "^8.72.1",
+    "@typescript-eslint/parser": "^8.72.2",
     "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
